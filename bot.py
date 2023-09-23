@@ -29,7 +29,7 @@ from middlewares.weekend import WeekendCallbackMiddleware
 # runing pullong proccess new updates
 async def main():
     dotenv_path = Path(__file__).parent
-    real_path = dotenv_path.joinpath(dotenv_path, '.env.py')
+    real_path = dotenv_path.joinpath(dotenv_path, '.env')
     load_dotenv(dotenv_path=real_path)
 
     logging.basicConfig(
@@ -45,10 +45,10 @@ async def main():
     # dp.include_router(group_games.router)
     # dp.include_router(usernames.router)
     # dp.include_router(checkin.router)
-    # dp.include_router(common.router)
+    dp.include_router(common.router)
     # dp.include_router(ordering_food.router)
 
-    dp.callback_query.outer_middleware(WeekendCallbackMiddleware())
+    # dp.callback_query.outer_middleware(WeekendCallbackMiddleware())
 
     # -------end--work---area---------
 
