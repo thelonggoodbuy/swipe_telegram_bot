@@ -46,22 +46,56 @@ async def cmd_start(message: types.Message):
     )
 
 
+
+
+
+
+
+
+
+
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.fsm.context import FSMContext
+
+
 # --------------work area-----------------------
 
+class LoginState(StatesGroup):
+    users_email = State()
+    users_password = State()
+
+
+
 @router.callback_query(F.data == "sign_in")
-async def callback_cmd_sign_in(callback: types.CallbackQuery):
-    await callback.answer(
-        text="Спасибі, але функція авторизації ще не розроблена"
+async def callback_cmd_sign_in(callback: types.CallbackQuery, state: FSMContext):
+
+    await callback.message.answer(
+        text="Введіть емейл користувача",
+        # reply_markup=make_row_keyboard(available_food_names)
     )
+    await state.set_state(LoginState.users_email)
+    print('------states-------')
+    print(LoginState.users_email.state)
+    print(LoginState.users_password.state)
+    print('------states-------')
+
+
+
+
+
+    # your_variable = callback.message.text
+
+    # if your_variable:
+    #   print("Cool!")
+        # await callback.message.answer(
+        #     text="Спасибі, але функція авторизації ще не розроблена"
+        # )
+        # await callback.message.answer(
+        #     text=f"Спасибі, {your_variable}!"
+        # )
 
 
 # --------END---work area-----------------------
-
-
-
-
-
-
 
 
 
