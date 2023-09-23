@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "swipe-telegram-bot"
+version = "0.1.0"
+description = ""
+authors = ["thelonggoodbuy <thelonggoodbuy1991@gmail.com>"]
+readme = "README.md"
+packages = [{include = "swipe_telegram_bot"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+aiogram = "^3.0.0"
+python-dotenv = "^1.0.0"
+pydantic-settings = "^2.0.3"
+httpx = {extras = ["http2"], version = "^0.25.0"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
