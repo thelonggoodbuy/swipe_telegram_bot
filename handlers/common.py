@@ -67,19 +67,41 @@ class LoginState(StatesGroup):
 
 
 @router.callback_query(F.data == "sign_in")
-async def callback_cmd_sign_in(callback: types.CallbackQuery, state: FSMContext):
+async def callback_cmd_sign_in(callback: types.CallbackQuery,\
+                                state: FSMContext):
 
     await callback.message.answer(
         text="Введіть емейл користувача",
-        # reply_markup=make_row_keyboard(available_food_names)
     )
     await state.set_state(LoginState.users_email)
-    print('------states-------')
-    print(LoginState.users_email.state)
-    print(LoginState.users_password.state)
-    print('------states-------')
 
 
+@router.message(LoginState.users_email)
+async def process_email(message: Message, state: FSMContext) -> None:
+    await state.update_data(email=message.text)
+    await message.answer(
+        text="Введіть пароль"
+    )
+    await state.set_state(LoginState.users_password)
+
+
+
+@router.message(LoginState.users_password)
+async def process_password(message: Message, state: FSMContext) -> None:
+    await state.update_data(password=message.text)
+    auth_data = await state.get_data()
+    await message.answer(
+        text=f"Вітаю! Email {auth_data['email']} та пароль {auth_data['password']}"
+    )
+
+
+    # await state.set_state()
+    # print('---------------------------')
+    # print('You are here!')
+    # user_data = await state.get_state()
+    # print(user_data)
+    # print('---------------------------')
+    # print(LoginState)
 
 
 
