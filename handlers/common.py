@@ -42,6 +42,7 @@ async def cmd_start(message: types.Message):
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from filters.correct_email_filter import ChatTypeFilter
+import httpx
 
 
 
@@ -89,9 +90,34 @@ async def handling_uncorrect_email(message: Message, state: FSMContext) -> None:
 async def process_password(message: Message, state: FSMContext) -> None:
     await state.update_data(users_password=message.text)
     auth_data = await state.get_data()
-    await message.answer(
-        text=f"Вітаю! Email {auth_data['users_email']} та пароль {auth_data['users_password']}"
+    # await message.answer(
+    #     text=f"Вітаю! Email {auth_data['users_email']} та пароль {auth_data['users_password']}"
+    # )
+
+    with httpx.Client() as client:
+        url = "http://159.89.29.63/users/auth/login_simple_user/"
+
+        # data = {"email": auth_data['users_email'], "password": {auth_data['users_password']}}
+        data = {"email": "initial_builder@gmail.com", "password": "initial_password"}
+        print('----AUTH----DATA------------------------------')
+        print(auth_data['users_email'])
+        print(auth_data['users_email'].__class__)
+        print(auth_data['users_password'])
+        print(auth_data['users_password'].__class__)
+        print('---TEST----DATA-------------------------------')
+        print(data['email'])
+        print(data['email'].__class__)
+        print(data['password'])
+        print(data['password'].__class__)
+        print('----------------------------------------------')
+        response = client.post(url, data=data, timeout=10.0)
+
+        await message.answer(
+        # text=f"Вітаю! Email {auth_data['users_email']} та пароль {auth_data['users_password']}"
+        text = response.text
     )
+
+
     await state.clear()
 
 
