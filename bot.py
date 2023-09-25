@@ -24,6 +24,8 @@ from handlers import group_games, usernames,\
 
 
 from middlewares.weekend import WeekendCallbackMiddleware
+from aiogram.fsm.storage.redis import RedisStorage
+
 
 
 # runing pullong proccess new updates
@@ -38,7 +40,11 @@ async def main():
         )
 
     bot = Bot(token=os.getenv('BOT_TOKEN'), parse_mode="HTML")
-    dp = Dispatcher(storage=MemoryStorage())
+
+    redis_storage = RedisStorage.from_url('redis://localhost:6379')
+
+    # dp = Dispatcher(storage=MemoryStorage())
+    dp = Dispatcher(storage=redis_storage)
 
     # ---------work-----area----------
 
