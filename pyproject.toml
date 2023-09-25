@@ -12,6 +12,7 @@ aiogram = "^3.0.0"
 python-dotenv = "^1.0.0"
 pydantic-settings = "^2.0.3"
 httpx = {extras = ["http2"], version = "^0.25.0"}
+email-validator = "^2.0.0.post2"
 
 
 [build-system]

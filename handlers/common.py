@@ -13,6 +13,7 @@ router = Router()
 
 
 
+
 # @router.message(Command(commands=["start"]))
 # async def cmd_start(message: Message, state: FSMContext):
 #     await state.clear()
@@ -24,6 +25,7 @@ router = Router()
 
 
 # @router.message(F.data == "start")
+
 @router.message(Command(commands=["start"]))
 async def cmd_start(message: types.Message):
     builder = InlineKeyboardBuilder()
@@ -43,6 +45,7 @@ async def cmd_start(message: types.Message):
     await message.answer(
         text="Привіт! Залогінся або зареєструйся =)",
         reply_markup=builder.as_markup()
+        # reply_markup=ReplyKeyboardRemove()
     )
 
 
@@ -56,33 +59,47 @@ async def cmd_start(message: types.Message):
 
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
-
+from filters.correct_email_filter import ChatTypeFilter
 
 # --------------work area-----------------------
 
 class LoginState(StatesGroup):
+    # unvalidated_email = State()
     users_email = State()
     users_password = State()
 
 
-
+# request and wait email state
 @router.callback_query(F.data == "sign_in")
 async def callback_cmd_sign_in(callback: types.CallbackQuery,\
                                 state: FSMContext):
 
     await callback.message.answer(
         text="Введіть емейл користувача",
+        
     )
     await state.set_state(LoginState.users_email)
 
 
-@router.message(LoginState.users_email)
-async def process_email(message: Message, state: FSMContext) -> None:
-    await state.update_data(email=message.text)
+# save emails state if email is valid
+@router.message(LoginState.users_email, ChatTypeFilter())
+async def save_email(message: Message, state: FSMContext) -> None:
+    await state.update_data(users_email=message.text)
     await message.answer(
         text="Введіть пароль"
     )
     await state.set_state(LoginState.users_password)
+
+
+
+# email is not valid. We are not saving it.
+@router.message(LoginState.users_email)
+async def handling_uncorrect_email(message: Message, state: FSMContext) -> None:
+        await message.answer(
+        text="Помилка в емейлі. Такой адресси електронної пошти не може існувати. Введіть існуючу."
+    )
+ 
+
 
 
 
@@ -95,26 +112,6 @@ async def process_password(message: Message, state: FSMContext) -> None:
     )
 
 
-    # await state.set_state()
-    # print('---------------------------')
-    # print('You are here!')
-    # user_data = await state.get_state()
-    # print(user_data)
-    # print('---------------------------')
-    # print(LoginState)
-
-
-
-    # your_variable = callback.message.text
-
-    # if your_variable:
-    #   print("Cool!")
-        # await callback.message.answer(
-        #     text="Спасибі, але функція авторизації ще не розроблена"
-        # )
-        # await callback.message.answer(
-        #     text=f"Спасибі, {your_variable}!"
-        # )
 
 
 # --------END---work area-----------------------
