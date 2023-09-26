@@ -12,10 +12,10 @@ class ChatTypeFilter(BaseFilter):  # [1]
     #     self.email = email
 
     async def __call__(self, message: Message) -> bool:  # [3]
-        print('------FILTER---CALLL-------')
-        print(message.text)
+        # print('------FILTER---CALLL-------')
+        # print(message.text)
         email = message.text
-        print('---------------------------')
+        # print('---------------------------')
         # if isinstance(self.chat_type, str):
         #     return message.chat.type == self.chat_type
         # else:
@@ -23,8 +23,8 @@ class ChatTypeFilter(BaseFilter):  # [1]
         try:
             validate_email_status = validate_email(email)
             email = validate_email_status.normalized
-            print('return TRUE')
+            # print('return TRUE')
             return True
         except EmailNotValidError:
-            print('return False')
+            # print('return False')
             return False

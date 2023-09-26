@@ -95,20 +95,27 @@ async def process_password(message: Message, state: FSMContext) -> None:
     # )
 
     with httpx.Client() as client:
-        url = "http://159.89.29.63/users/auth/login_simple_user/"
+        # url = "http://159.89.29.63/users/auth/login_simple_user/"
+        url = "http://127.0.0.1:8000/users/auth/login_simple_user/"
 
-        # data = {"email": auth_data['users_email'], "password": {auth_data['users_password']}}
-        data = {"email": "initial_builder@gmail.com", "password": "initial_password"}
+        data = {"email": auth_data['users_email'], "password": auth_data['users_password']}
+        other_data = {"email": "initial_builder@gmail.com", "password": "initial_password"}
         print('----AUTH----DATA------------------------------')
         print(auth_data['users_email'])
         print(auth_data['users_email'].__class__)
+        print(type(auth_data['users_email']))
         print(auth_data['users_password'])
         print(auth_data['users_password'].__class__)
+        print(data)
+        print(type(data))
         print('---TEST----DATA-------------------------------')
-        print(data['email'])
-        print(data['email'].__class__)
-        print(data['password'])
-        print(data['password'].__class__)
+        print(other_data['email'])
+        print(other_data['email'].__class__)
+        print(type(auth_data['users_email']))
+        print(other_data['password'])
+        print(other_data['password'].__class__)
+        print(other_data)
+        # print(type(other_data))
         print('----------------------------------------------')
         response = client.post(url, data=data, timeout=10.0)
 
