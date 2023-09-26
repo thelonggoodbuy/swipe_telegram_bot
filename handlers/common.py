@@ -43,6 +43,14 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from filters.correct_email_filter import ChatTypeFilter
 import httpx
+import json
+
+
+from pymongo import MongoClient
+client = MongoClient("mongodb://localhost:27017/")
+db = client.rptutorial
+
+bot_aut_collection = db.bot_aut_collection
 
 
 
@@ -90,39 +98,50 @@ async def handling_uncorrect_email(message: Message, state: FSMContext) -> None:
 async def process_password(message: Message, state: FSMContext) -> None:
     await state.update_data(users_password=message.text)
     auth_data = await state.get_data()
-    # await message.answer(
-    #     text=f"Вітаю! Email {auth_data['users_email']} та пароль {auth_data['users_password']}"
-    # )
 
     with httpx.Client() as client:
-        # url = "http://159.89.29.63/users/auth/login_simple_user/"
         url = "http://127.0.0.1:8000/users/auth/login_simple_user/"
 
         data = {"email": auth_data['users_email'], "password": auth_data['users_password']}
-        other_data = {"email": "initial_builder@gmail.com", "password": "initial_password"}
-        print('----AUTH----DATA------------------------------')
-        print(auth_data['users_email'])
-        print(auth_data['users_email'].__class__)
-        print(type(auth_data['users_email']))
-        print(auth_data['users_password'])
-        print(auth_data['users_password'].__class__)
-        print(data)
-        print(type(data))
-        print('---TEST----DATA-------------------------------')
-        print(other_data['email'])
-        print(other_data['email'].__class__)
-        print(type(auth_data['users_email']))
-        print(other_data['password'])
-        print(other_data['password'].__class__)
-        print(other_data)
-        # print(type(other_data))
-        print('----------------------------------------------')
+
         response = client.post(url, data=data, timeout=10.0)
 
+        # print('-----------RESPONSE---------')
+        # print(response.status_code)
+        # print('----------------------------')
+
+        print('-----------RESPONSE---------')
+        print(response.text)
+        print(type(response.text))
+        response_dict = json.loads(response.text)
+        match response.status_code:
+            case 200:
+                print('Your status 200')
+                auth_object = {"chat_id": message.chat.id,
+                               "email": response_dict["email"],
+                               "access_token": response_dict["tokens"]["access"],
+                               "refresh_token": response_dict["tokens"]["refresh"]}
+                
+                # bot_aut_collection.insert_one(auth_object)
+                bot_aut_collection.update_one({"chat_id": message.chat.id},\
+                                               {"$set": auth_object}, upsert=True)
+                
+                response_text = f"Ви увійшли в бот як {response_dict['email']}"
+            case 400:
+                print('Your status 400')
+                response_text = response_dict['non_field_errors']        
+        print('----------------------------')
+
         await message.answer(
-        # text=f"Вітаю! Email {auth_data['users_email']} та пароль {auth_data['users_password']}"
-        text = response.text
+        text = response_text
     )
+
+
+
+    # print('----QUERY--CHAT----')
+    # print(message.chat.id)
+    # print('------------------')
+
 
 
     await state.clear()
