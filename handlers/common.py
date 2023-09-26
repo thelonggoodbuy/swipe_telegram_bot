@@ -106,13 +106,6 @@ async def process_password(message: Message, state: FSMContext) -> None:
 
         response = client.post(url, data=data, timeout=10.0)
 
-        # print('-----------RESPONSE---------')
-        # print(response.status_code)
-        # print('----------------------------')
-
-        print('-----------RESPONSE---------')
-        print(response.text)
-        print(type(response.text))
         response_dict = json.loads(response.text)
         match response.status_code:
             case 200:
@@ -122,7 +115,6 @@ async def process_password(message: Message, state: FSMContext) -> None:
                                "access_token": response_dict["tokens"]["access"],
                                "refresh_token": response_dict["tokens"]["refresh"]}
                 
-                # bot_aut_collection.insert_one(auth_object)
                 bot_aut_collection.update_one({"chat_id": message.chat.id},\
                                                {"$set": auth_object}, upsert=True)
                 
@@ -135,13 +127,6 @@ async def process_password(message: Message, state: FSMContext) -> None:
         await message.answer(
         text = response_text
     )
-
-
-
-    # print('----QUERY--CHAT----')
-    # print(message.chat.id)
-    # print('------------------')
-
 
 
     await state.clear()
