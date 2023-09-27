@@ -3,12 +3,6 @@ from datetime import datetime
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher, types, html, F
-from aiogram.filters.command import Command
-
-from aiogram.enums.dice_emoji import DiceEmoji
-from aiogram.filters import CommandObject
-from aiogram.fsm.storage.memory import MemoryStorage
-# from config_reader import config
 
 from pathlib import Path
 import os
@@ -16,14 +10,8 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
-# from handlers import group_games, usernames,\
-#                      checkin, common, ordering_food
+from handlers import common
 
-from handlers import group_games, usernames,\
-                     checkin, common, ordering_food
-
-
-from middlewares.weekend import WeekendCallbackMiddleware
 from aiogram.fsm.storage.redis import RedisStorage
 
 
@@ -46,15 +34,7 @@ async def main():
     dp = Dispatcher(storage=redis_storage)
 
     # ---------work-----area----------
-
-    # dp.include_router(group_games.router)
-    # dp.include_router(usernames.router)
-    # dp.include_router(checkin.router)
     dp.include_router(common.router)
-    # dp.include_router(ordering_food.router)
-
-    # dp.callback_query.outer_middleware(WeekendCallbackMiddleware())
-
     # -------end--work---area---------
 
     await bot.delete_webhook(drop_pending_updates=True)

@@ -4,7 +4,7 @@ import json
 from aiogram import F, Router, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup
+from aiogram.fsm.state import State, StatesGroup, default_state
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder, KeyboardBuilder
@@ -17,6 +17,10 @@ from keyboards.simple_row import make_row_keyboard
 
 
 router = Router()
+
+
+
+
 
 
 @router.message(Command(commands=["start"]))
@@ -42,8 +46,6 @@ async def cmd_start(message: types.Message):
 
 
 
-
-
 client = MongoClient("mongodb://localhost:27017/")
 db = client.rptutorial
 bot_aut_collection = db.bot_aut_collection
@@ -55,19 +57,15 @@ bot_aut_collection = db.bot_aut_collection
 class LoginState(StatesGroup):
     users_email = State()
     users_password = State()
-
+    is_not_default_state = State()
 
 # request and wait email state
 @router.message(F.text == "Увійти в бот")
 async def sign_in(message: types.Message, state: FSMContext):
 
-    await message.reply("Отличный выбор!", reply_markup=types.ReplyKeyboardRemove())
-
-    await message.reply(
-        text="Введіть емейл користувача",        
-    )
+    await message.reply("Введіть емейл користувача", reply_markup=types.ReplyKeyboardRemove())
+    await state.update_data(is_not_default_state='true')
     await state.set_state(LoginState.users_email)
-
 
 
 # save emails state if email is valid
@@ -80,8 +78,11 @@ async def save_email(message: Message, state: FSMContext) -> None:
     await state.set_state(LoginState.users_password)
 
 
-# email is not valid. We are not saving it.
-@router.message(LoginState.users_email)
+from filters.state_still_in_validation_filter import IsNotDefaultStateFilter
+from aiogram.filters.state import StateFilter
+
+
+@router.message(LoginState.users_email, ~StateFilter(default_state))
 async def handling_uncorrect_email(message: Message, state: FSMContext) -> None:
         await message.answer(
         text="Помилка в емейлі. Такой адресси електронної пошти не може існувати. Введіть існуючу."
@@ -102,6 +103,7 @@ async def process_password(message: Message, state: FSMContext) -> None:
         response = client.post(url, data=data, timeout=10.0)
 
         response_dict = json.loads(response.text)
+
         match response.status_code:
             case 200:
                 print('Your status 200')
@@ -115,13 +117,11 @@ async def process_password(message: Message, state: FSMContext) -> None:
                 
                 response_text = f"Ви увійшли в бот як {response_dict['email']}"
             case 400:
-                print('Your status 400')
-                response_text = response_dict['non_field_errors']        
+                response_text = response_dict['non_field_errors'][0]
 
         await message.answer(
         text = response_text
     )
-
 
     await state.clear()
 
@@ -136,16 +136,13 @@ async def handling_empty_password(message: Message, state: FSMContext) -> None:
 # ---------------END----WORK------AREA------------------
 
 
-
 # Registration
 @router.message(F.text == "Зареєструватись")
 async def sign_in(message: types.Message, state: FSMContext):
-
-    await message.reply("Ви намагаєтеся зареєструватися. Вона пока не розроблена")
+    await message.reply("Ви намагаєтеся зареєструватися. Функція пока не розроблена.")
 
 
 # List of ads
 @router.message(F.text == "Список оголошень")
 async def sign_in(message: types.Message, state: FSMContext):
-
-    await message.reply("Ви намагаєтеся отримати список оголошень. Вона пока не розроблена")
+    await message.reply("Ви намагаєтеся отримати список оголошень. Функція пока не розроблена.")
