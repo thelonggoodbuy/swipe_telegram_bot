@@ -43,7 +43,6 @@ async def main():
 
     redis_storage = RedisStorage.from_url('redis://localhost:6379')
 
-    # dp = Dispatcher(storage=MemoryStorage())
     dp = Dispatcher(storage=redis_storage)
 
     # ---------work-----area----------
@@ -58,7 +57,7 @@ async def main():
 
     # -------end--work---area---------
 
-    # await bot.delete_webhook(drop_pending_updates=True)
+    await bot.delete_webhook(drop_pending_updates=True)
 
     await dp.start_polling(bot)
 

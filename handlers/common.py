@@ -1,11 +1,17 @@
+import httpx
+import json
+
 from aiogram import F, Router, types
 from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder, KeyboardBuilder
 
+from pymongo import MongoClient
 
-
+from filters.correct_email_filter import ChatTypeFilter
 from keyboards.simple_row import make_row_keyboard
 
 
@@ -17,43 +23,30 @@ router = Router()
 async def cmd_start(message: types.Message):
 
 
-    builder = InlineKeyboardBuilder()
-    builder.add(types.InlineKeyboardButton(
-        text='Увійти в бот',
-        callback_data="sign_in"
+    builder = ReplyKeyboardBuilder()
+
+    builder.add(types.KeyboardButton(
+        text='Увійти в бот'
     ))
-    builder.add(types.InlineKeyboardButton(
-        text='Зареєструватись',
-        callback_data="sign_up"
+    builder.add(types.KeyboardButton(
+        text='Зареєструватись'
     ))
-    builder.add(types.InlineKeyboardButton(
-        text='Список оголошень',
-        callback_data="list_of_ads"
+    builder.add(types.KeyboardButton(
+        text='Список оголошень'
     ))
 
     await message.answer(
         text="Привіт! Залогінся або зареєструйся =)",
-        reply_markup=builder.as_markup()
+        reply_markup=builder.as_markup(resize_keyboard=True)
     )
 
 
 
 
-from aiogram.fsm.state import State, StatesGroup
-from aiogram.fsm.context import FSMContext
-from filters.correct_email_filter import ChatTypeFilter
-import httpx
-import json
 
-
-from pymongo import MongoClient
 client = MongoClient("mongodb://localhost:27017/")
 db = client.rptutorial
-
 bot_aut_collection = db.bot_aut_collection
-
-
-
 
 
 
@@ -65,10 +58,12 @@ class LoginState(StatesGroup):
 
 
 # request and wait email state
-@router.callback_query(F.data == "sign_in")
-async def callback_cmd_sign_in(callback: types.CallbackQuery,\
-                                state: FSMContext):
-    await callback.message.answer(
+@router.message(F.text == "Увійти в бот")
+async def sign_in(message: types.Message, state: FSMContext):
+
+    await message.reply("Отличный выбор!", reply_markup=types.ReplyKeyboardRemove())
+
+    await message.reply(
         text="Введіть емейл користувача",        
     )
     await state.set_state(LoginState.users_email)
@@ -122,7 +117,6 @@ async def process_password(message: Message, state: FSMContext) -> None:
             case 400:
                 print('Your status 400')
                 response_text = response_dict['non_field_errors']        
-        print('----------------------------')
 
         await message.answer(
         text = response_text
@@ -140,3 +134,18 @@ async def handling_empty_password(message: Message, state: FSMContext) -> None:
     )
 
 # ---------------END----WORK------AREA------------------
+
+
+
+# Registration
+@router.message(F.text == "Зареєструватись")
+async def sign_in(message: types.Message, state: FSMContext):
+
+    await message.reply("Ви намагаєтеся зареєструватися. Вона пока не розроблена")
+
+
+# List of ads
+@router.message(F.text == "Список оголошень")
+async def sign_in(message: types.Message, state: FSMContext):
+
+    await message.reply("Ви намагаєтеся отримати список оголошень. Вона пока не розроблена")
