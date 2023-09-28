@@ -15,34 +15,12 @@ from filters.correct_email_filter import ChatTypeFilter
 from keyboards.simple_row import make_row_keyboard
 
 
+from filters.state_still_in_validation_filter import IsNotDefaultStateFilter
+from aiogram.filters.state import StateFilter
 
 router = Router()
 
 
-
-
-
-
-@router.message(Command(commands=["start"]))
-async def cmd_start(message: types.Message):
-
-
-    builder = ReplyKeyboardBuilder()
-
-    builder.add(types.KeyboardButton(
-        text='Увійти в бот'
-    ))
-    builder.add(types.KeyboardButton(
-        text='Зареєструватись'
-    ))
-    builder.add(types.KeyboardButton(
-        text='Список оголошень'
-    ))
-
-    await message.answer(
-        text="Привіт! Залогінся або зареєструйся =)",
-        reply_markup=builder.as_markup(resize_keyboard=True)
-    )
 
 
 
@@ -58,6 +36,7 @@ class LoginState(StatesGroup):
     users_email = State()
     users_password = State()
     is_not_default_state = State()
+
 
 # request and wait email state
 @router.message(F.text == "Увійти в бот")
@@ -78,12 +57,11 @@ async def save_email(message: Message, state: FSMContext) -> None:
     await state.set_state(LoginState.users_password)
 
 
-from filters.state_still_in_validation_filter import IsNotDefaultStateFilter
-from aiogram.filters.state import StateFilter
 
 
 @router.message(LoginState.users_email, ~StateFilter(default_state))
 async def handling_uncorrect_email(message: Message, state: FSMContext) -> None:
+        
         await message.answer(
         text="Помилка в емейлі. Такой адресси електронної пошти не може існувати. Введіть існуючу."
     )
@@ -135,14 +113,3 @@ async def handling_empty_password(message: Message, state: FSMContext) -> None:
 
 # ---------------END----WORK------AREA------------------
 
-
-# Registration
-@router.message(F.text == "Зареєструватись")
-async def sign_in(message: types.Message, state: FSMContext):
-    await message.reply("Ви намагаєтеся зареєструватися. Функція пока не розроблена.")
-
-
-# List of ads
-@router.message(F.text == "Список оголошень")
-async def sign_in(message: types.Message, state: FSMContext):
-    await message.reply("Ви намагаєтеся отримати список оголошень. Функція пока не розроблена.")

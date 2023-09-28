@@ -1,16 +1,12 @@
-from datetime import datetime
-
 import asyncio
 import logging
-from aiogram import Bot, Dispatcher, types, html, F
-
-from pathlib import Path
 import os
 
-from dotenv import load_dotenv
+from aiogram import Bot, Dispatcher
 from pathlib import Path
+from dotenv import load_dotenv
 
-from handlers import common
+from handlers import invite, login, sign_up, list_of_ads
 
 from aiogram.fsm.storage.redis import RedisStorage
 
@@ -33,9 +29,11 @@ async def main():
 
     dp = Dispatcher(storage=redis_storage)
 
-    # ---------work-----area----------
-    dp.include_router(common.router)
-    # -------end--work---area---------
+    dp.include_router(invite.router)
+    dp.include_router(login.router)
+    dp.include_router(sign_up.router)
+    dp.include_router(list_of_ads.router)
+    
 
     await bot.delete_webhook(drop_pending_updates=True)
 
