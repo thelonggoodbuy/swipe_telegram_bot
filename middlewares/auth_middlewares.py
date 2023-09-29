@@ -6,8 +6,6 @@ from aiogram import BaseMiddleware
 from aiogram.types import Message
 
 
-import pprint
-
 
 class IsAuthenticatedMiddleware(BaseMiddleware):
     async def __call__(
@@ -26,9 +24,6 @@ class IsAuthenticatedMiddleware(BaseMiddleware):
             return await handler(event, data)
         else:
             return await event.answer(text="Ви не увійшли в систему. Будьласка увійдіть або зареєструйтеся.")
-        
-
-import pprint
 
 
 class GetJWTAuthenticationMiddleware(BaseMiddleware):
