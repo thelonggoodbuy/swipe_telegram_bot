@@ -16,19 +16,14 @@ class OnlySignUpMiddleware(BaseMiddleware):
             event: Message,
             data: Dict[str, Any]
     ) -> Any:
-        print('---------ESF---------')
         entry_sing_up_flag = get_flag(data, "entry_sing_up_flag")
-        print(entry_sing_up_flag)
-        print(type(entry_sing_up_flag))
-        print('---------------------')
-        # pprint.pprint(data)
-        # print('--------')
 
         if data['raw_state'] and len(data['raw_state']) != 0: 
-            if data['raw_state'] == 'SignUpState:users_email':
-                return await handler(event, data)
-            if data['raw_state'] == 'SignUpState:users_password':
-                return await handler(event, data)
+            match data['raw_state']:
+                case 'SignUpState:users_email':
+                    return await handler(event, data)
+                case 'SignUpState:users_password':
+                    return await handler(event, data)
 
         if entry_sing_up_flag:
             return await handler(event, data)

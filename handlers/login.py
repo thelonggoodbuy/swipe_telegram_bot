@@ -11,7 +11,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder, 
 
 from pymongo import MongoClient
 
-from filters.correct_email_filter import ChatTypeFilter
+from filters.correct_email_filter import EmailValidationFilter
 from keyboards.simple_row import make_row_keyboard
 
 
@@ -48,7 +48,7 @@ async def sign_in(message: types.Message, state: FSMContext):
 
 
 # save emails state if email is valid
-@router.message(LoginState.users_email, ChatTypeFilter())
+@router.message(LoginState.users_email, EmailValidationFilter())
 async def save_email(message: Message, state: FSMContext) -> None:
     await state.update_data(users_email=message.text)
     await message.answer(
@@ -57,11 +57,8 @@ async def save_email(message: Message, state: FSMContext) -> None:
     await state.set_state(LoginState.users_password)
 
 
-
-
 @router.message(LoginState.users_email, ~StateFilter(default_state))
 async def handling_uncorrect_email(message: Message, state: FSMContext) -> None:
-        
         await message.answer(
         text="Помилка в емейлі. Такой адресси електронної пошти не може існувати. Введіть існуючу."
     )

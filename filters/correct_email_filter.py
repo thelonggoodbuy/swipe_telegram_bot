@@ -7,7 +7,7 @@ from email_validator import validate_email, EmailNotValidError
 
 
 
-class ChatTypeFilter(BaseFilter):
+class EmailValidationFilter(BaseFilter):
 
     async def __call__(self, message: Message) -> bool:
         email = message.text
