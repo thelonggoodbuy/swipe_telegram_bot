@@ -39,7 +39,6 @@ async def sign_up_handler(message: types.Message, state: FSMContext):
 
     await message.reply("Введіть свій email.", 
                         reply_markup=cancel_keyboard())
-    # await state.update_data(is_not_default_state='true')
     await state.set_state(SignUpState.users_email)
 
 
@@ -77,10 +76,7 @@ async def handling_uncorrect_email(message: types.Message, state: FSMContext) ->
 
 @router.message(SignUpState.users_password, ~F.text.in_(management_commands_set))
 async def process_password(message: types.Message, state: FSMContext) -> None:
-    registration_data = await state.get_data()
-    print('-----------BEFORE---CHANGE---LIST----------------')
-    print(registration_data)
-    
+    registration_data = await state.get_data()    
     previouse_states=registration_data['previouse_states']
     new_previouse_states = previouse_states.append('users_password')
     await state.update_data(users_password=message.text, previouse_states=new_previouse_states)
@@ -90,16 +86,12 @@ async def process_password(message: types.Message, state: FSMContext) -> None:
     else:
         await state.update_data(is_all_fields_filled='true', previouse_states=previouse_states)
     registration_data = await state.get_data()
-    print('--------registration----data-----------')
-    print(registration_data)
-    print('---------------------------------------')
     await message.answer(
         text=f"Ви бажаєте зареєструватись як {registration_data['users_email']} з паролем {registration_data['users_password']} ",
         reply_markup=edit_registration_data_keyboard()
     )
 
 
-# # --------------------------WORK----AREA-------------------------------------------------
 # return to privious stage
 @router.message(F.text == "Назад")
 async def return_to_previous_step(message: types.Message, state: FSMContext):
@@ -115,8 +107,6 @@ async def return_to_previous_step(message: types.Message, state: FSMContext):
         await message.answer("Введіть пароль.")
         await state.set_state(SignUpState.users_password)
    
-
-# --------------------------END----AREA----------------------------------------------------
 # Update data commands
 @router.message(F.text == "Змінити email")
 async def change_email(message: types.Message, state: FSMContext):
@@ -134,5 +124,56 @@ async def sign_up_cancel(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
         text="Реєстрацію відмінено. Залогінся або зареєструйся =)",
+        reply_markup=make_invite_keyboard()
+    )
+
+
+import httpx
+import json
+from pymongo import MongoClient
+
+
+client = MongoClient("mongodb://localhost:27017/")
+db = client.rptutorial
+bot_aut_collection = db.bot_aut_collection
+
+
+@router.message(F.text == 'Підтвердити')
+async def sign_up_confirmation(message: types.Message, state: FSMContext):
+    auth_data = await state.get_data()
+
+    # ----------------NEW----CODE--------------------------------------------
+    with httpx.Client() as client:
+        url = "http://127.0.0.1:8000/users/auth/register_builder_user/"
+        data = {"email": auth_data['users_email'], "password": auth_data['users_password']}
+        response = client.post(url, data=data, timeout=10.0)
+        response_dict = json.loads(response.text)
+
+        match response.status_code:
+            case 200:
+                print('Your status 200')
+                # auth_object = {"chat_id": message.chat.id,
+                #                "email": response_dict["email"],
+                #                "access_token": response_dict["tokens"]["access"],
+                #                "refresh_token": response_dict["tokens"]["refresh"]}
+                
+                # bot_aut_collection.update_one({"chat_id": message.chat.id},\
+                #                                {"$set": auth_object}, upsert=True)
+                
+                response_text = f"Ви зареєстровані в системі як {response_dict['email']}"
+            case 400:
+                response_text = response_dict['non_field_errors'][0]
+
+        await message.answer(
+        text = response_text
+    )
+
+    # -----------------END----NEW------CODE----------------------------------
+
+
+
+    await state.clear()
+    await message.answer(
+        text="Ви успішно зареєструвалися",
         reply_markup=make_invite_keyboard()
     )
