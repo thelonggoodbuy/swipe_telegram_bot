@@ -10,10 +10,10 @@ def edit_registration_data_keyboard() -> ReplyKeyboardMarkup:
         text='Відміна'
     ))
     builder.add(types.KeyboardButton(
-        text='Відрегувати email'
+        text='Змінити email'
     ))
     builder.add(types.KeyboardButton(
-        text='Відрегувати пароль'
+        text='Змінити пароль'
     ))
     builder.add(types.KeyboardButton(
         text='Підтвердити'
