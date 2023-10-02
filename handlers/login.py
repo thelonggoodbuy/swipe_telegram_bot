@@ -13,6 +13,7 @@ from pymongo import MongoClient
 
 from filters.correct_email_filter import EmailValidationFilter
 from keyboards.simple_row import make_row_keyboard
+from keyboards.main_keyboard import make_main_keyboard
 
 
 from filters.state_still_in_validation_filter import IsNotDefaultStateFilter
@@ -91,6 +92,10 @@ async def process_password(message: Message, state: FSMContext) -> None:
                                                {"$set": auth_object}, upsert=True)
                 
                 response_text = f"Ви увійшли в бот як {response_dict['email']}"
+                await message.answer(
+                    text = "Ласкаво просимо!",
+                    reply_markup=make_main_keyboard()
+                )
             case 400:
                 response_text = response_dict['non_field_errors'][0]
 
@@ -99,6 +104,7 @@ async def process_password(message: Message, state: FSMContext) -> None:
     )
 
     await state.clear()
+
 
 
 # password string is not valid and empty.

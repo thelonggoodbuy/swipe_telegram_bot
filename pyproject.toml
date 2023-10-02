@@ -15,6 +15,8 @@ httpx = {extras = ["http2"], version = "^0.25.0"}
 email-validator = "^2.0.0.post2"
 redis = "^5.0.0"
 pymongo = "^4.5.0"
+aiogram-pagination = "^0.1.9"
+aiogram-dialog = "^2.0.0"
 
 
 [build-system]

@@ -14,7 +14,7 @@ class IsAuthenticatedMiddleware(BaseMiddleware):
             event: Message,
             data: Dict[str, Any]
     ) -> Any:
-
+        
         auth_pymongo_client = pymongo.MongoClient("mongodb://localhost:27017/")
         auth_db = auth_pymongo_client.rptutorial
         auth_collection = auth_db.bot_aut_collection
@@ -33,6 +33,8 @@ class GetJWTAuthenticationMiddleware(BaseMiddleware):
             event: Message,
             data: Dict[str, Any]
     ) -> Any:
+        
+
         auth_pymongo_client = pymongo.MongoClient("mongodb://localhost:27017/")
         auth_db = auth_pymongo_client.rptutorial
         auth_collection = auth_db.bot_aut_collection

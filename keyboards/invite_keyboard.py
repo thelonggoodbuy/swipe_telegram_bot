@@ -13,7 +13,7 @@ def make_invite_keyboard() -> ReplyKeyboardMarkup:
     builder.add(types.KeyboardButton(
         text='Зареєструватись'
     ))
-    builder.add(types.KeyboardButton(
-        text='Список оголошень'
-    ))
+    # builder.add(types.KeyboardButton(
+    #     text='Список оголошень'
+    # ))
     return builder.as_markup(resize_keyboard=True)

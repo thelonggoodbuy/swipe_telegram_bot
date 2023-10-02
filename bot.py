@@ -6,7 +6,7 @@ from aiogram import Bot, Dispatcher
 from pathlib import Path
 from dotenv import load_dotenv
 
-from handlers import invite, login, sign_up, list_of_ads
+from handlers import invite, login, sign_up, list_of_ads, main_menu
 
 from aiogram.fsm.storage.redis import RedisStorage
 
@@ -32,6 +32,7 @@ async def main():
     dp.include_router(invite.router)
     dp.include_router(login.router)
     dp.include_router(sign_up.router)
+    dp.include_router(main_menu.router)
     dp.include_router(list_of_ads.router)
     
 
