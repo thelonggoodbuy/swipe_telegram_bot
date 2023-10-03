@@ -15,6 +15,13 @@ from aiogram.types import FSInputFile, URLInputFile, BufferedInputFile
 
 from aiogram.methods.send_location import SendLocation
 
+
+
+from aiogram.fsm.context import FSMContext
+
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+
 router = Router()
 router.message.middleware(auth_middlewares.IsAuthenticatedMiddleware())
 router.message.middleware(auth_middlewares.GetJWTAuthenticationMiddleware())
@@ -31,22 +38,24 @@ class AdsFeedState(StatesGroup):
     current_ads_index = State()
 
 
+builder = InlineKeyboardBuilder()
 
-# @router.message(Command("special_buttons"))
-# async def cmd_special_buttons(message: types.Message):
-#     builder = ReplyKeyboardBuilder()
-#     # метод row позволяет явным образом сформировать ряд
-#     # из одной или нескольких кнопок. Например, первый ряд
-#     # будет состоять из двух кнопок...
-#     builder.row(
-#         types.KeyboardButton(text="Запросить геолокацию", request_location=True),
-#         types.KeyboardButton(text="Запросить контакт", request_contact=True)
-#     )
-
+builder.add(types.InlineKeyboardButton(
+        text="<<",
+        callback_data="previous_ads")
+    )
+builder.add(types.InlineKeyboardButton(
+        text="показати геолокацію",
+        callback_data="get_me_geo")
+    )
+builder.add(types.InlineKeyboardButton(
+        text=">>",
+        callback_data="next_ads")
+    )
 
 # List of ads
 @router.message(F.text == "Список оголошень")
-async def list_of_ads_handler(message: types.Message, middleware_access_data: Dict[str, Any] | None):
+async def list_of_ads_handler(message: types.Message, middleware_access_data: Dict[str, Any] | None, state: FSMContext):
 
     await message.reply("Всі оголошення разом:")
 
@@ -61,37 +70,56 @@ async def list_of_ads_handler(message: types.Message, middleware_access_data: Di
             case 200:
                 result = json.loads(response.text)
                 basic_url = 'http://127.0.0.1:8000'
+            
 
-                for ads in result:
-                    await message.answer(
-                        text=str(ads)
-                    )
-                    await message.answer(
-                        text = f"link to image is { basic_url + ads['accomodation_data']['main_image']}"
-                    )
-                    image_url = f"{ basic_url + ads['accomodation_data']['main_image']}"
+                await state.update_data(total_ads=result,
+                                        total_ads_quantity=len(result),
+                                        current_ads_index=0)
 
-                    image_from_url = URLInputFile(image_url)
+                # state_data = await state.get_data()
+                # print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+                # print(state_data)
+                # print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
 
-                    await message.answer_photo(
-                        image_from_url,
-                        caption="Зображення будинку",
-                    )
-                    # await message.reply_location(latitude=50.4442097549618, longitude=30.549555457035364)
-                    await message.reply_location(latitude=ads['accomodation_data']['location_x'],
-                                                 longitude=ads['accomodation_data']['location_y'])
 
-                    
+
+                # for ads in result:
+                #     await message.answer(
+                #         text=str(ads)
+                #     )
+                #     await message.answer(
+                #         text = f"link to image is { basic_url + ads['accomodation_data']['main_image']}"
+                #     )
+                #     image_url = f"{ basic_url + ads['accomodation_data']['main_image']}"
+
+                #     image_from_url = URLInputFile(image_url)
+
+                #     await message.answer_photo(
+                #         image_from_url,
+                #         caption="Зображення будинку",
+                #     )
+                #     # await message.reply_location(latitude=50.4442097549618, longitude=30.549555457035364)
+                #     await message.reply_location(latitude=ads['accomodation_data']['location_x'],
+                #                                  longitude=ads['accomodation_data']['location_y'])
+
 
                 
+                first_ads = await state.get_data()
+
+                image_url = f"{ basic_url + first_ads['total_ads'][0]['accomodation_data']['main_image']}"
+
+                image_from_url = URLInputFile(image_url)
+
+                await message.answer_photo(
+                    image_from_url,
+                    caption=first_ads['total_ads'][0]['description'],
+                    reply_markup=builder.as_markup()
+                )
                 await message.answer(
-                text = "Все ок!",
-                reply_markup=make_main_keyboard()
-               )
+                text=f"{1} з {len(result)}"
+                    )
 
 
-
-                
             case 400:
                 response_text = response.text
                 await message.answer(
@@ -113,9 +141,68 @@ async def list_of_ads_handler(message: types.Message, middleware_access_data: Di
                     url = "http://127.0.0.1:8000/ads/ads-feed/"
                     client.headers['Authorization'] = f"Bearer {response_data['access']}"
                     response = client.get(url, timeout=10.0)
-                    print('--------------YOU----FINISH----REFRESSH----TOKEN---!!!!-')
-                    print(response.text)
-
 
                 if response.status_code == 401:
                     print(response.text)
+
+
+
+@router.callback_query(F.data == "next_ads")
+async def get_next_ads(callback: types.CallbackQuery, state: FSMContext):
+    ads_data = await state.get_data()
+    current_ads_index = ads_data['current_ads_index']
+    last_ads_index = ads_data['total_ads_quantity']
+    all_ads = ads_data['total_ads']
+    if current_ads_index < last_ads_index -1:
+        await state.update_data(current_ads_index=(current_ads_index+1))
+        
+        # new_index = await state.get_data()['']
+        basic_url = 'http://127.0.0.1:8000'
+
+        image_url = f"{ basic_url + all_ads[current_ads_index+1]['accomodation_data']['main_image']}"
+
+        image_from_url = URLInputFile(image_url)
+
+        await callback.message.answer_photo(
+            image_from_url,
+            caption=all_ads[current_ads_index+1]['description'],
+            reply_markup=builder.as_markup()
+        )
+        await callback.message.answer(
+            text=f"{current_ads_index+1} з {last_ads_index - 1}"
+        )
+    else:
+        await callback.message.answer(
+            text="Нажаль, це останнє оголошення"
+        )
+
+@router.callback_query(F.data == "previous_ads")
+
+async def previous_next_ads(callback: types.CallbackQuery, state: FSMContext):
+    
+    ads_data = await state.get_data()
+    current_ads_index = ads_data['current_ads_index']
+    last_ads_index = ads_data['total_ads_quantity']
+    all_ads = ads_data['total_ads']
+    if current_ads_index > 0:
+        await state.update_data(current_ads_index=(current_ads_index-1))
+        
+        # new_index = await state.get_data()['']
+        basic_url = 'http://127.0.0.1:8000'
+
+        image_url = f"{ basic_url + all_ads[current_ads_index-1]['accomodation_data']['main_image']}"
+
+        image_from_url = URLInputFile(image_url)
+
+        await callback.message.answer_photo(
+            image_from_url,
+            caption=all_ads[current_ads_index-1]['description'],
+            reply_markup=builder.as_markup()
+        )
+        await callback.message.answer(
+            text=f"{current_ads_index+1} з {last_ads_index-1}"
+        )
+    else:
+        await callback.message.answer(
+            text="Це оголошення найновіше"
+        )
