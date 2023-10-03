@@ -13,7 +13,7 @@ from keyboards.main_keyboard import make_main_keyboard
 from middlewares import auth_middlewares
 from aiogram.types import FSInputFile, URLInputFile, BufferedInputFile
 
-
+from aiogram.methods.send_location import SendLocation
 
 router = Router()
 router.message.middleware(auth_middlewares.IsAuthenticatedMiddleware())
@@ -29,6 +29,19 @@ class AdsFeedState(StatesGroup):
     total_ads = State()
     total_ads_quantity = State()
     current_ads_index = State()
+
+
+
+# @router.message(Command("special_buttons"))
+# async def cmd_special_buttons(message: types.Message):
+#     builder = ReplyKeyboardBuilder()
+#     # метод row позволяет явным образом сформировать ряд
+#     # из одной или нескольких кнопок. Например, первый ряд
+#     # будет состоять из двух кнопок...
+#     builder.row(
+#         types.KeyboardButton(text="Запросить геолокацию", request_location=True),
+#         types.KeyboardButton(text="Запросить контакт", request_contact=True)
+#     )
 
 
 # List of ads
@@ -47,10 +60,6 @@ async def list_of_ads_handler(message: types.Message, middleware_access_data: Di
         match response.status_code:
             case 200:
                 result = json.loads(response.text)
-                print('========================================================================')
-                print(result)
-                print('------------------------------------------------------------------------')
-
                 basic_url = 'http://127.0.0.1:8000'
 
                 for ads in result:
@@ -66,8 +75,13 @@ async def list_of_ads_handler(message: types.Message, middleware_access_data: Di
 
                     await message.answer_photo(
                         image_from_url,
-                        caption="Зображення будинку"
+                        caption="Зображення будинку",
                     )
+                    # await message.reply_location(latitude=50.4442097549618, longitude=30.549555457035364)
+                    await message.reply_location(latitude=ads['accomodation_data']['location_x'],
+                                                 longitude=ads['accomodation_data']['location_y'])
+
+                    
 
                 
                 await message.answer(
