@@ -1,32 +1,24 @@
 import asyncio
 import logging
-import os
 
 from aiogram import Bot, Dispatcher
-from pathlib import Path
-from dotenv import load_dotenv
-
 from handlers import invite, login, sign_up, list_of_ads, main_menu
-
+from services.get_secret_values import return_secret_value
 from aiogram.fsm.storage.redis import RedisStorage
 
 
 
-# runing pullong proccess new updates
 async def main():
-    dotenv_path = Path(__file__).parent
-    real_path = dotenv_path.joinpath(dotenv_path, '.env')
-    load_dotenv(dotenv_path=real_path)
+
+    bot_token_secret = return_secret_value("BOT_TOKEN")
+    redis_url_secret = return_secret_value("REDIS_STORAGE_URL")
 
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s"
         )
-
-    bot = Bot(token=os.getenv('BOT_TOKEN'), parse_mode="HTML")
-
-    redis_storage = RedisStorage.from_url('redis://localhost:6379')
-
+    bot = Bot(token=bot_token_secret, parse_mode="HTML")
+    redis_storage = RedisStorage.from_url(redis_url_secret)
     dp = Dispatcher(storage=redis_storage)
 
     dp.include_router(invite.router)
