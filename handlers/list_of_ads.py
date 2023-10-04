@@ -53,6 +53,17 @@ builder.add(types.InlineKeyboardButton(
         callback_data="next_ads")
     )
 
+builder_without_geo = InlineKeyboardBuilder()
+
+builder_without_geo.add(types.InlineKeyboardButton(
+        text="<<",
+        callback_data="previous_ads")
+    )
+builder_without_geo.add(types.InlineKeyboardButton(
+        text=">>",
+        callback_data="next_ads")
+    )
+
 # List of ads
 @router.message(F.text == "Оголошення")
 async def list_of_ads_handler(message: types.Message, middleware_access_data: Dict[str, Any] | None, state: FSMContext):
@@ -211,3 +222,18 @@ async def previous_next_ads(callback: types.CallbackQuery, state: FSMContext):
         await callback.message.answer(
             text="Це оголошення найновіше"
         )
+
+
+@router.callback_query(F.data == "get_me_geo")
+async def get_geolocation(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    print('===========================================================')
+    pprint.pprint(data)
+    print('===========================================================')
+    current_ads_index = data['current_ads_index']
+    current_ads = data['total_ads'][current_ads_index - 1]
+
+
+    await callback.message.reply_location(latitude=current_ads['accomodation_data']['location_x'],
+                                                 longitude=current_ads['accomodation_data']['location_y'],
+                                                 reply_markup=builder_without_geo.as_markup())
