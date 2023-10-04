@@ -153,7 +153,8 @@ async def get_next_ads(callback: types.CallbackQuery, state: FSMContext):
     current_ads_index = ads_data['current_ads_index']
     last_ads_index = ads_data['total_ads_quantity']
     all_ads = ads_data['total_ads']
-    if current_ads_index < last_ads_index -1:
+
+    if current_ads_index + 1 < last_ads_index:
         await state.update_data(current_ads_index=(current_ads_index+1))
         
         # new_index = await state.get_data()['']
@@ -169,7 +170,7 @@ async def get_next_ads(callback: types.CallbackQuery, state: FSMContext):
             reply_markup=builder.as_markup()
         )
         await callback.message.answer(
-            text=f"{current_ads_index+1} з {last_ads_index - 1}"
+            text=f"{current_ads_index+1} з {last_ads_index}"
         )
     else:
         await callback.message.answer(
