@@ -8,7 +8,7 @@ def make_main_keyboard() -> ReplyKeyboardMarkup:
     builder = ReplyKeyboardBuilder()
     builder.adjust(2, 2)
     builder.add(types.KeyboardButton(
-        text='Список оголошень'
+        text='Оголошення'
     ))
     builder.add(types.KeyboardButton(
         text='Створити оголошення'

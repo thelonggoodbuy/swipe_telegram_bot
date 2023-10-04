@@ -54,7 +54,7 @@ builder.add(types.InlineKeyboardButton(
     )
 
 # List of ads
-@router.message(F.text == "Список оголошень")
+@router.message(F.text == "Оголошення")
 async def list_of_ads_handler(message: types.Message, middleware_access_data: Dict[str, Any] | None, state: FSMContext):
 
     await message.reply("Всі оголошення разом:")
@@ -106,6 +106,10 @@ async def list_of_ads_handler(message: types.Message, middleware_access_data: Di
                 
                 first_ads = await state.get_data()
 
+                # print('==================================================')
+                # pprint.pprint(first_ads)
+                # print('==================================================')
+
                 image_url = f"{ basic_url + first_ads['total_ads'][0]['accomodation_data']['main_image']}"
 
                 image_from_url = URLInputFile(image_url)
@@ -115,9 +119,16 @@ async def list_of_ads_handler(message: types.Message, middleware_access_data: Di
                     caption=first_ads['total_ads'][0]['description'],
                     reply_markup=builder.as_markup()
                 )
+                
+
                 await message.answer(
                 text=f"{1} з {len(result)}"
                     )
+                second_ads_id = first_ads['current_ads_index'] + 1
+
+                await state.update_data(total_ads=result,
+                                        total_ads_quantity=len(result),
+                                        current_ads_index=second_ads_id)
 
 
             case 400:
@@ -154,55 +165,48 @@ async def get_next_ads(callback: types.CallbackQuery, state: FSMContext):
     last_ads_index = ads_data['total_ads_quantity']
     all_ads = ads_data['total_ads']
 
-    if current_ads_index + 1 < last_ads_index:
-        await state.update_data(current_ads_index=(current_ads_index+1))
-        
-        # new_index = await state.get_data()['']
+    if current_ads_index < last_ads_index:
         basic_url = 'http://127.0.0.1:8000'
-
-        image_url = f"{ basic_url + all_ads[current_ads_index+1]['accomodation_data']['main_image']}"
-
+        image_url = f"{ basic_url + all_ads[current_ads_index]['accomodation_data']['main_image']}"
         image_from_url = URLInputFile(image_url)
-
         await callback.message.answer_photo(
             image_from_url,
-            caption=all_ads[current_ads_index+1]['description'],
+            caption=all_ads[current_ads_index]['description'],
             reply_markup=builder.as_markup()
         )
         await callback.message.answer(
             text=f"{current_ads_index+1} з {last_ads_index}"
         )
+        await state.update_data(current_ads_index=(current_ads_index+1))
+        ads_data = await state.get_data()
     else:
         await callback.message.answer(
-            text="Нажаль, це останнє оголошення"
+            text="Це останнє оголошення"
         )
 
-@router.callback_query(F.data == "previous_ads")
 
+
+@router.callback_query(F.data == "previous_ads")
 async def previous_next_ads(callback: types.CallbackQuery, state: FSMContext):
-    
     ads_data = await state.get_data()
     current_ads_index = ads_data['current_ads_index']
     last_ads_index = ads_data['total_ads_quantity']
     all_ads = ads_data['total_ads']
-    if current_ads_index > 0:
-        await state.update_data(current_ads_index=(current_ads_index-1))
-        
-        # new_index = await state.get_data()['']
+
+    if current_ads_index > 1:
         basic_url = 'http://127.0.0.1:8000'
 
-        image_url = f"{ basic_url + all_ads[current_ads_index-1]['accomodation_data']['main_image']}"
-
+        image_url = f"{ basic_url + all_ads[current_ads_index-2]['accomodation_data']['main_image']}"
         image_from_url = URLInputFile(image_url)
-
         await callback.message.answer_photo(
             image_from_url,
-            caption=all_ads[current_ads_index-1]['description'],
+            caption=all_ads[current_ads_index-2]['description'],
             reply_markup=builder.as_markup()
         )
         await callback.message.answer(
-            text=f"{current_ads_index+1} з {last_ads_index-1}"
+            text=f"{current_ads_index-1} з {last_ads_index}"
         )
+        await state.update_data(current_ads_index=(current_ads_index-1))
     else:
         await callback.message.answer(
             text="Це оголошення найновіше"
