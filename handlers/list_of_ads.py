@@ -70,6 +70,7 @@ async def list_of_ads_handler(message: types.Message, middleware_access_data: Di
 
     # in doc header here
     with httpx.Client() as client:
+
         url = f"{base_url_secret}/ads/ads-feed/"
         client.headers['Authorization'] = f"Bearer {auth_data['access_token']}"
         response = client.get(url, timeout=10.0)
