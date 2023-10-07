@@ -20,13 +20,19 @@ from services.request_to_swipeapi import OrdinaryRequestSwipeAPI
 from filters.state_still_in_validation_filter import IsNotDefaultStateFilter
 from aiogram.filters.state import StateFilter
 
+
+from services.get_secret_values import return_secret_value
+
+
+
 router = Router()
 
+mongo_url_secret = return_secret_value('MONGO_URL')
+base_url_secret = return_secret_value('BASE_URL')
 
 
 
-
-client = MongoClient("mongodb://localhost:27017/")
+client = MongoClient(mongo_url_secret)
 db = client.rptutorial
 bot_aut_collection = db.bot_aut_collection
 
@@ -72,42 +78,9 @@ async def process_password(message: Message, state: FSMContext) -> None:
     await state.update_data(users_password=message.text)
     auth_data = await state.get_data()
 
-    # with httpx.Client() as client:
-    #     url = "http://127.0.0.1:8000/users/auth/login_simple_user/"
-
-    #     data = {"email": auth_data['users_email'], "password": auth_data['users_password']}
-
-    #     response = client.post(url, data=data, timeout=10.0)
-
-    #     response_dict = json.loads(response.text)
-
-    #     match response.status_code:
-    #         case 200:
-    #             print('Your status 200')
-    #             auth_object = {"chat_id": message.chat.id,
-    #                            "email": response_dict["email"],
-    #                            "access_token": response_dict["tokens"]["access"],
-    #                            "refresh_token": response_dict["tokens"]["refresh"]}
-                
-    #             bot_aut_collection.update_one({"chat_id": message.chat.id},\
-    #                                            {"$set": auth_object}, upsert=True)
-                
-    #             response_text = f"Ви увійшли в бот як {response_dict['email']}"
-    #             await message.answer(
-    #                 text = "Ласкаво просимо!",
-    #                 reply_markup=make_main_keyboard()
-    #             )
-    #         case 400:
-    #             response_text = response_dict['non_field_errors'][0]
-
-    #     await message.answer(
-    #     text = response_text
-    # )
-
     login_request = OrdinaryRequestSwipeAPI()
-    
     method = 'post'
-    url = "http://127.0.0.1:8000/users/auth/login_simple_user/"
+    url = f"{base_url_secret}/users/auth/login_simple_user/"
     chat_id = message.chat.id
     data = {"email": auth_data['users_email'], "password": auth_data['users_password']}
     parametr_dict = {'data': data}
@@ -138,13 +111,9 @@ async def process_password(message: Message, state: FSMContext) -> None:
     await state.clear()
 
 
-
 # password string is not valid and empty.
 @router.message(LoginState.users_password)
 async def handling_empty_password(message: Message, state: FSMContext) -> None:
         await message.answer(
         text="Заповнення поля пароль є обов'язковим."
     )
-
-# ---------------END----WORK------AREA------------------
-

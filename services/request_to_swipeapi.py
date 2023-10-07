@@ -1,13 +1,20 @@
 import httpx
 import json
 
-
 from pymongo import MongoClient
 
+from services.get_secret_values import return_secret_value
 
-client = MongoClient('mongodb://localhost:27017/')
+
+
+
+mongo_url_secret = return_secret_value('MONGO_URL')
+base_url_secret = return_secret_value('BASE_URL')
+
+client = MongoClient(mongo_url_secret)
 db = client.rptutorial
 bot_aut_collection = db.bot_aut_collection
+
 
 
 
@@ -31,7 +38,7 @@ class OrdinaryRequestSwipeAPI():
 
     def handling_401(self, method, url, client, chat_id, auth_data, **kwargs):
         data = {'refresh': auth_data['refresh_token']}
-        refresh_url = f"http://127.0.0.1:8000/api/token/refresh/"
+        refresh_url = f"{base_url_secret}/api/token/refresh/"
         response = client.post(refresh_url, data=data, timeout=10.0)
 
         if response.status_code == 200:
