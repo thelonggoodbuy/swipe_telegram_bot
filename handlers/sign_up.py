@@ -10,12 +10,21 @@ from middlewares.sign_up_middlewares import OnlySignUpMiddleware
 
 from aiogram.filters.state import StateFilter
 from filters.correct_email_filter import EmailValidationFilter
+from services.get_secret_values import return_secret_value
 
-# from .states import SignUpState
 
+from services.request_to_swipeapi import OrdinaryRequestSwipeAPI, RegistrationRequestSwipeAPI
+
+
+import httpx
+import json
+from pymongo import MongoClient
 
 from aiogram import flags
 
+
+mongo_url_secret = return_secret_value('MONGO_URL')
+base_url_secret = return_secret_value('BASE_URL')
 
 
 router = Router()
@@ -128,12 +137,7 @@ async def sign_up_cancel(message: types.Message, state: FSMContext):
     )
 
 
-import httpx
-import json
-from pymongo import MongoClient
-
-
-client = MongoClient("mongodb://localhost:27017/")
+client = MongoClient(mongo_url_secret)
 db = client.rptutorial
 bot_aut_collection = db.bot_aut_collection
 
@@ -143,34 +147,32 @@ async def sign_up_confirmation(message: types.Message, state: FSMContext):
     auth_data = await state.get_data()
 
     # ----------------NEW----CODE--------------------------------------------
-    with httpx.Client() as client:
-        url = "http://127.0.0.1:8000/users/auth/register_builder_user/"
-        data = {"email": auth_data['users_email'], "password": auth_data['users_password']}
-        response = client.post(url, data=data, timeout=10.0)
-        response_dict = json.loads(response.text)
+    # with httpx.Client() as client:
+    #     url = "http://127.0.0.1:8000/users/auth/register_builder_user/"
+    #     data = {"email": auth_data['users_email'], "password": auth_data['users_password']}
+    #     response = client.post(url, data=data, timeout=10.0)
+    #     response_dict = json.loads(response.text)
 
-        match response.status_code:
-            case 200:
-                print('Your status 200')
-                # auth_object = {"chat_id": message.chat.id,
-                #                "email": response_dict["email"],
-                #                "access_token": response_dict["tokens"]["access"],
-                #                "refresh_token": response_dict["tokens"]["refresh"]}
-                
-                # bot_aut_collection.update_one({"chat_id": message.chat.id},\
-                #                                {"$set": auth_object}, upsert=True)
-                
-                response_text = f"Ви зареєстровані в системі як {response_dict['email']}"
-            case 400:
-                response_text = response_dict['non_field_errors'][0]
+    registration_request = RegistrationRequestSwipeAPI()
+    method = 'post'
+    url = f"{base_url_secret}/users/auth/register_builder_user/"
+    chat_id = message.chat.id
+    data = {"email": auth_data['users_email'], "password": auth_data['users_password']}
+    request_dict = {'data': data}
+    response = registration_request(method, url, chat_id, **request_dict)
+    response_dict = json.loads(response.text)
 
-        await message.answer(
+    match response.status_code:
+        case 200:
+            response_text = f"Ви зареєстровані в системі як {response_dict['email']}"
+        case 400:
+            response_text = response_dict['non_field_errors'][0]
+
+    await message.answer(
         text = response_text
     )
 
     # -----------------END----NEW------CODE----------------------------------
-
-
 
     await state.clear()
     await message.answer(

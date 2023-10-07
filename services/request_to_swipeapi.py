@@ -49,3 +49,11 @@ class OrdinaryRequestSwipeAPI():
             client.headers['Authorization'] = f"Bearer {response_data['access']}"
             response = getattr(client, method)(url, **kwargs)
             return response
+        
+
+class RegistrationRequestSwipeAPI(OrdinaryRequestSwipeAPI):
+    def __call__(self, method, url, chat_id, **kwargs):
+        with httpx.Client() as client:
+            # auth_data = bot_aut_collection.find_one({"chat_id": chat_id})
+            auth_data = None
+            return self.send_request(method, url, client, chat_id, auth_data, **kwargs)
