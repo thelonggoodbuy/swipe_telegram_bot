@@ -13,8 +13,6 @@ router = Router()
 @router.message(F.text == "Ласкаво просимо!")
 async def cmd_start(message: types.Message):
 
-    print('-------NEW----ELEMENT----------')
-
     await message.answer(
         text="Головне меню",
         reply_markup=make_main_keyboard()

@@ -16,6 +16,9 @@ from services.get_secret_values import return_secret_value
 
 from middlewares import auth_middlewares
 
+from services.request_to_swipeapi import OrdinaryRequestSwipeAPI
+
+
 
 router = Router()
 router.message.middleware(auth_middlewares.IsAuthenticatedMiddleware())
@@ -69,61 +72,120 @@ async def list_of_ads_handler(message: types.Message, middleware_access_data: Di
     auth_data = bot_aut_collection.find_one({"chat_id": message.chat.id})
 
     # in doc header here
-    with httpx.Client() as client:
+    ads_request = OrdinaryRequestSwipeAPI()
+    method = 'get'
+    url = f"{base_url_secret}/ads/ads-feed/"
+    chat_id = message.chat.id
+    ads_dict = {"headers":{
+        'Authorization': f"Bearer {auth_data['access_token']}"
+    }}
+    response = ads_request(method, url, chat_id, **ads_dict)
+    match response.status_code:
+        case 200:
+            result = json.loads(response.text)
+            await state.update_data(total_ads=result,
+                                    total_ads_quantity=len(result),
+                                    current_ads_index=0)
+            
+            first_ads = await state.get_data()
+            image_url = f"{ base_url_secret + first_ads['total_ads'][0]['accomodation_data']['main_image']}"
+            image_from_url = URLInputFile(image_url)
 
-        url = f"{base_url_secret}/ads/ads-feed/"
-        client.headers['Authorization'] = f"Bearer {auth_data['access_token']}"
-        response = client.get(url, timeout=10.0)
-        match response.status_code:
-            case 200:
-                result = json.loads(response.text)
-                await state.update_data(total_ads=result,
-                                        total_ads_quantity=len(result),
-                                        current_ads_index=0)
-                
-                first_ads = await state.get_data()
-                image_url = f"{ base_url_secret + first_ads['total_ads'][0]['accomodation_data']['main_image']}"
-                image_from_url = URLInputFile(image_url)
-
-                await message.answer_photo(
-                    image_from_url,
-                    caption=first_ads['total_ads'][0]['description'],
-                    reply_markup=builder.as_markup()
+            await message.answer_photo(
+                image_from_url,
+                caption=first_ads['total_ads'][0]['description'],
+                reply_markup=builder.as_markup()
+            )     
+            await message.answer(
+            text=f"{1} з {len(result)}"
                 )
+            second_ads_id = first_ads['current_ads_index'] + 1
+            await state.update_data(total_ads=result,
+                                    total_ads_quantity=len(result),
+                                    current_ads_index=second_ads_id)
+
+        case 400:
+            response_text = response.text
+            await message.answer(
+            text = str(response_text),
+            reply_markup=make_main_keyboard()
+            )
+
+        # case 401:
+        #     data = {'refresh': auth_data['refresh_token']}
+        #     url = f"{base_url_secret}/api/token/refresh/"
+        #     response = client.post(url, data=data, timeout=10.0)
+        #     if response.status_code == 200:
+        #         response_data = json.loads(response.text)
+        #         new_access_token = response_data['access']
+        #         bot_aut_collection.update_one({"chat_id": message.chat.id},\
+        #                                     {"$set": {"access_token": new_access_token}}, upsert=False)
                 
-                await message.answer(
-                text=f"{1} з {len(result)}"
-                    )
-                second_ads_id = first_ads['current_ads_index'] + 1
-                await state.update_data(total_ads=result,
-                                        total_ads_quantity=len(result),
-                                        current_ads_index=second_ads_id)
+        #         url = f"{base_url_secret}/ads/ads-feed/"
+        #         client.headers['Authorization'] = f"Bearer {response_data['access']}"
+        #         response = client.get(url, timeout=10.0)
+
+        #     if response.status_code == 401:
+        #         print(response.text)
+    # ------------------------------------------------------------------------------------------------------------------------
+    # with httpx.Client() as client:
+
+    #     ads_request = OrdinaryRequestSwipeAPI()
+    #     method = 'post'
+    #     url = f"{base_url_secret}/ads/ads-feed/"
+
+    #     client.headers['Authorization'] = f"Bearer {auth_data['access_token']}"
+    #     response = client.get(url, timeout=10.0)
+    #     match response.status_code:
+    #         case 200:
+    #             result = json.loads(response.text)
+    #             await state.update_data(total_ads=result,
+    #                                     total_ads_quantity=len(result),
+    #                                     current_ads_index=0)
+                
+    #             first_ads = await state.get_data()
+    #             image_url = f"{ base_url_secret + first_ads['total_ads'][0]['accomodation_data']['main_image']}"
+    #             image_from_url = URLInputFile(image_url)
+
+    #             await message.answer_photo(
+    #                 image_from_url,
+    #                 caption=first_ads['total_ads'][0]['description'],
+    #                 reply_markup=builder.as_markup()
+    #             )
+                
+    #             await message.answer(
+    #             text=f"{1} з {len(result)}"
+    #                 )
+    #             second_ads_id = first_ads['current_ads_index'] + 1
+    #             await state.update_data(total_ads=result,
+    #                                     total_ads_quantity=len(result),
+    #                                     current_ads_index=second_ads_id)
 
 
-            case 400:
-                response_text = response.text
-                await message.answer(
-                text = str(response_text),
-                reply_markup=make_main_keyboard()
-                )
+    #         case 400:
+    #             response_text = response.text
+    #             await message.answer(
+    #             text = str(response_text),
+    #             reply_markup=make_main_keyboard()
+    #             )
 
-            case 401:
-                data = {'refresh': auth_data['refresh_token']}
-                url = f"{base_url_secret}/api/token/refresh/"
-                response = client.post(url, data=data, timeout=10.0)
-                if response.status_code == 200:
-                    response_data = json.loads(response.text)
-                    new_access_token = response_data['access']
-                    bot_aut_collection.update_one({"chat_id": message.chat.id},\
-                                               {"$set": {"access_token": new_access_token}}, upsert=False)
+    #         case 401:
+    #             data = {'refresh': auth_data['refresh_token']}
+    #             url = f"{base_url_secret}/api/token/refresh/"
+    #             response = client.post(url, data=data, timeout=10.0)
+    #             if response.status_code == 200:
+    #                 response_data = json.loads(response.text)
+    #                 new_access_token = response_data['access']
+    #                 bot_aut_collection.update_one({"chat_id": message.chat.id},\
+    #                                            {"$set": {"access_token": new_access_token}}, upsert=False)
                     
-                    url = f"{base_url_secret}/ads/ads-feed/"
-                    client.headers['Authorization'] = f"Bearer {response_data['access']}"
-                    response = client.get(url, timeout=10.0)
+    #                 url = f"{base_url_secret}/ads/ads-feed/"
+    #                 client.headers['Authorization'] = f"Bearer {response_data['access']}"
+    #                 response = client.get(url, timeout=10.0)
 
-                if response.status_code == 401:
-                    print(response.text)
-
+    #             if response.status_code == 401:
+    #                 print(response.text)
+    # ------------------------------------------------------------------------------------------------------------------------
 
 
 @router.callback_query(F.data == "next_ads")

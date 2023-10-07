@@ -54,6 +54,5 @@ class OrdinaryRequestSwipeAPI():
 class RegistrationRequestSwipeAPI(OrdinaryRequestSwipeAPI):
     def __call__(self, method, url, chat_id, **kwargs):
         with httpx.Client() as client:
-            # auth_data = bot_aut_collection.find_one({"chat_id": chat_id})
             auth_data = None
             return self.send_request(method, url, client, chat_id, auth_data, **kwargs)
