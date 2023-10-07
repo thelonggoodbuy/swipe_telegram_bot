@@ -14,7 +14,8 @@ from pymongo import MongoClient
 from filters.correct_email_filter import EmailValidationFilter
 from keyboards.simple_row import make_row_keyboard
 from keyboards.main_keyboard import make_main_keyboard
-
+from keyboards.invite_keyboard import make_invite_keyboard
+from services.request_to_swipeapi import OrdinaryRequestSwipeAPI
 
 from filters.state_still_in_validation_filter import IsNotDefaultStateFilter
 from aiogram.filters.state import StateFilter
@@ -71,37 +72,68 @@ async def process_password(message: Message, state: FSMContext) -> None:
     await state.update_data(users_password=message.text)
     auth_data = await state.get_data()
 
-    with httpx.Client() as client:
-        url = "http://127.0.0.1:8000/users/auth/login_simple_user/"
+    # with httpx.Client() as client:
+    #     url = "http://127.0.0.1:8000/users/auth/login_simple_user/"
 
-        data = {"email": auth_data['users_email'], "password": auth_data['users_password']}
+    #     data = {"email": auth_data['users_email'], "password": auth_data['users_password']}
 
-        response = client.post(url, data=data, timeout=10.0)
+    #     response = client.post(url, data=data, timeout=10.0)
 
-        response_dict = json.loads(response.text)
+    #     response_dict = json.loads(response.text)
 
-        match response.status_code:
-            case 200:
-                print('Your status 200')
-                auth_object = {"chat_id": message.chat.id,
-                               "email": response_dict["email"],
-                               "access_token": response_dict["tokens"]["access"],
-                               "refresh_token": response_dict["tokens"]["refresh"]}
+    #     match response.status_code:
+    #         case 200:
+    #             print('Your status 200')
+    #             auth_object = {"chat_id": message.chat.id,
+    #                            "email": response_dict["email"],
+    #                            "access_token": response_dict["tokens"]["access"],
+    #                            "refresh_token": response_dict["tokens"]["refresh"]}
                 
-                bot_aut_collection.update_one({"chat_id": message.chat.id},\
-                                               {"$set": auth_object}, upsert=True)
+    #             bot_aut_collection.update_one({"chat_id": message.chat.id},\
+    #                                            {"$set": auth_object}, upsert=True)
                 
-                response_text = f"Ви увійшли в бот як {response_dict['email']}"
-                await message.answer(
-                    text = "Ласкаво просимо!",
-                    reply_markup=make_main_keyboard()
-                )
-            case 400:
-                response_text = response_dict['non_field_errors'][0]
+    #             response_text = f"Ви увійшли в бот як {response_dict['email']}"
+    #             await message.answer(
+    #                 text = "Ласкаво просимо!",
+    #                 reply_markup=make_main_keyboard()
+    #             )
+    #         case 400:
+    #             response_text = response_dict['non_field_errors'][0]
 
-        await message.answer(
-        text = response_text
-    )
+    #     await message.answer(
+    #     text = response_text
+    # )
+
+    login_request = OrdinaryRequestSwipeAPI()
+    
+    method = 'post'
+    url = "http://127.0.0.1:8000/users/auth/login_simple_user/"
+    chat_id = message.chat.id
+    data = {"email": auth_data['users_email'], "password": auth_data['users_password']}
+    parametr_dict = {'data': data}
+    response = login_request(method, url, chat_id, **parametr_dict)
+    response_dict = json.loads(response.text)
+
+    match response.status_code:
+        case 200:
+            auth_object = {"chat_id": message.chat.id,
+                            "email": response_dict["email"],
+                            "access_token": response_dict["tokens"]["access"],
+                            "refresh_token": response_dict["tokens"]["refresh"]}
+            
+            bot_aut_collection.update_one({"chat_id": message.chat.id},\
+                                        {"$set": auth_object}, upsert=True)
+        
+            response_text = f"Ви увійшли в бот як {response_dict['email']}"
+            await message.answer(
+                text = response_text,
+                reply_markup=make_main_keyboard()
+            )
+        case 400:
+            await message.answer(
+                text = 'Помилка в email або в пароли',
+                reply_markup=make_invite_keyboard()
+            )      
 
     await state.clear()
 
