@@ -42,8 +42,9 @@ class GetJWTAuthenticationMiddleware(BaseMiddleware):
 
         try:
             middleware_access_data = {"access_token": user_obj["access_token"],
-            "refresh_token": user_obj["refresh_token"],
-            "email": user_obj["email"]}
+                                    "refresh_token": user_obj["refresh_token"],
+                                    "email": user_obj["email"],
+                                    "user_id": user_obj["user_id"]}
             data['middleware_access_data'] = middleware_access_data
         except TypeError:
             pass

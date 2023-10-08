@@ -91,6 +91,7 @@ async def process_password(message: Message, state: FSMContext) -> None:
         case 200:
             auth_object = {"chat_id": message.chat.id,
                             "email": response_dict["email"],
+                            "user_id": response_dict["id"],
                             "access_token": response_dict["tokens"]["access"],
                             "refresh_token": response_dict["tokens"]["refresh"]}
             

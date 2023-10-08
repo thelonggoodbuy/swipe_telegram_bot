@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
-from handlers import invite, login, sign_up, list_of_ads, main_menu
+from handlers import invite, login, sign_up, list_of_ads, main_menu, my_profile
 from services.get_secret_values import return_secret_value
 from aiogram.fsm.storage.redis import RedisStorage
 
@@ -26,7 +26,7 @@ async def main():
     dp.include_router(sign_up.router)
     dp.include_router(main_menu.router)
     dp.include_router(list_of_ads.router)
-    
+    dp.include_router(my_profile.router)
 
     await bot.delete_webhook(drop_pending_updates=True)
 
