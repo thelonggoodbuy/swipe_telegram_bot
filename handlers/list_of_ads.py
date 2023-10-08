@@ -111,82 +111,6 @@ async def list_of_ads_handler(message: types.Message, middleware_access_data: Di
             reply_markup=make_main_keyboard()
             )
 
-        # case 401:
-        #     data = {'refresh': auth_data['refresh_token']}
-        #     url = f"{base_url_secret}/api/token/refresh/"
-        #     response = client.post(url, data=data, timeout=10.0)
-        #     if response.status_code == 200:
-        #         response_data = json.loads(response.text)
-        #         new_access_token = response_data['access']
-        #         bot_aut_collection.update_one({"chat_id": message.chat.id},\
-        #                                     {"$set": {"access_token": new_access_token}}, upsert=False)
-                
-        #         url = f"{base_url_secret}/ads/ads-feed/"
-        #         client.headers['Authorization'] = f"Bearer {response_data['access']}"
-        #         response = client.get(url, timeout=10.0)
-
-        #     if response.status_code == 401:
-        #         print(response.text)
-    # ------------------------------------------------------------------------------------------------------------------------
-    # with httpx.Client() as client:
-
-    #     ads_request = OrdinaryRequestSwipeAPI()
-    #     method = 'post'
-    #     url = f"{base_url_secret}/ads/ads-feed/"
-
-    #     client.headers['Authorization'] = f"Bearer {auth_data['access_token']}"
-    #     response = client.get(url, timeout=10.0)
-    #     match response.status_code:
-    #         case 200:
-    #             result = json.loads(response.text)
-    #             await state.update_data(total_ads=result,
-    #                                     total_ads_quantity=len(result),
-    #                                     current_ads_index=0)
-                
-    #             first_ads = await state.get_data()
-    #             image_url = f"{ base_url_secret + first_ads['total_ads'][0]['accomodation_data']['main_image']}"
-    #             image_from_url = URLInputFile(image_url)
-
-    #             await message.answer_photo(
-    #                 image_from_url,
-    #                 caption=first_ads['total_ads'][0]['description'],
-    #                 reply_markup=builder.as_markup()
-    #             )
-                
-    #             await message.answer(
-    #             text=f"{1} з {len(result)}"
-    #                 )
-    #             second_ads_id = first_ads['current_ads_index'] + 1
-    #             await state.update_data(total_ads=result,
-    #                                     total_ads_quantity=len(result),
-    #                                     current_ads_index=second_ads_id)
-
-
-    #         case 400:
-    #             response_text = response.text
-    #             await message.answer(
-    #             text = str(response_text),
-    #             reply_markup=make_main_keyboard()
-    #             )
-
-    #         case 401:
-    #             data = {'refresh': auth_data['refresh_token']}
-    #             url = f"{base_url_secret}/api/token/refresh/"
-    #             response = client.post(url, data=data, timeout=10.0)
-    #             if response.status_code == 200:
-    #                 response_data = json.loads(response.text)
-    #                 new_access_token = response_data['access']
-    #                 bot_aut_collection.update_one({"chat_id": message.chat.id},\
-    #                                            {"$set": {"access_token": new_access_token}}, upsert=False)
-                    
-    #                 url = f"{base_url_secret}/ads/ads-feed/"
-    #                 client.headers['Authorization'] = f"Bearer {response_data['access']}"
-    #                 response = client.get(url, timeout=10.0)
-
-    #             if response.status_code == 401:
-    #                 print(response.text)
-    # ------------------------------------------------------------------------------------------------------------------------
-
 
 @router.callback_query(F.data == "next_ads")
 async def get_next_ads(callback: types.CallbackQuery, state: FSMContext):
@@ -250,3 +174,8 @@ async def get_geolocation(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.reply_location(latitude=current_ads['accomodation_data']['location_x'],
                                                  longitude=current_ads['accomodation_data']['location_y'],
                                                  reply_markup=builder_without_geo.as_markup())
+    
+
+
+
+

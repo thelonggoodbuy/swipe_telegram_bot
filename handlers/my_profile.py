@@ -30,24 +30,6 @@ async def profile_main_menu(message: types.Message, middleware_access_data: Dict
         text='Оберіть дію',
         reply_markup=make_main_profile_keyboards()
     )
-    # my_profile_request = OrdinaryRequestSwipeAPI()
-    # method = "get"
-    # user_id = middleware_access_data['user_id']
-    # url = f"{base_url_secret}/users/simple_user_update_and_detail/{user_id}/"
-    # chat_id = message.chat.id
-    # my_profile_dictionary = {"headers":{
-    #     'Authorization': f"Bearer {middleware_access_data['access_token']}"
-    # }}
-    # response = my_profile_request(method, url, chat_id, **my_profile_dictionary)
-    # match response.status_code:
-    #     case 200:
-    #         await message.answer(
-    #             text=f"{response.text}"
-    #             )
-    #     case _:
-    #         await message.answer(
-    #             text=f"{response.text}"
-    #             )
 
 
 @router.message(F.text == "Мої дані")
@@ -63,12 +45,9 @@ async def get_user_data(message: types.Message, middleware_access_data: Dict[str
     response = my_profile_request(method, url, chat_id, **my_profile_dictionary)
     user_data_string = ""
     response_dict = json.loads(response.text)
-    print('-----------RESPONSE---------')
-    print(response_dict)
-    print('----------------------------')
+
     photo_link = response_dict['photo']
 
-    # image_url = f"{ base_url_secret + all_ads[current_ads_index]['accomodation_data']['main_image']}"
     image_from_url = URLInputFile(photo_link)
 
     result_dict = {}
@@ -93,10 +72,6 @@ async def get_user_data(message: types.Message, middleware_access_data: Dict[str
 
     match response.status_code:
         case 200:
-            # await message.answer(
-            #     text=user_data_string
-            #     )
-            
             await message.answer_photo(
                 image_from_url,
                 caption=user_data_string,
@@ -107,3 +82,22 @@ async def get_user_data(message: types.Message, middleware_access_data: Dict[str
             await message.answer(
                 text=f"{response.text}"
                 )
+            
+
+
+@router.message(F.text == "Мої оголошення")
+async def return_my_ads_list(message: types.Message, middleware_access_data: Dict[str, Any] | None):
+    my_ads_list_request = OrdinaryRequestSwipeAPI()
+    method = "get"
+    # user_id = middleware_access_data['user_id']
+    url = f"{base_url_secret}/ads/ads/"
+    chat_id = message.chat.id
+    my_profile_dictionary = {"headers":{
+        'Authorization': f"Bearer {middleware_access_data['access_token']}"
+    }}
+    response = my_ads_list_request(method, url, chat_id, **my_profile_dictionary)
+    await message.answer(
+        text=response.text,
+        reply_markup=make_main_profile_keyboards()
+    )
+    
