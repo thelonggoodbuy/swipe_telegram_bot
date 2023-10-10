@@ -12,6 +12,8 @@ from aiogram.filters.state import StateFilter
 from filters.correct_email_filter import EmailValidationFilter
 from services.get_secret_values import return_secret_value
 
+from aiogram.utils.i18n import lazy_gettext as __
+from aiogram.utils.i18n import gettext as _
 
 from services.request_to_swipeapi import OrdinaryRequestSwipeAPI, RegistrationRequestSwipeAPI
 
@@ -30,9 +32,9 @@ base_url_secret = return_secret_value('BASE_URL')
 router = Router()
 router.message.middleware(OnlySignUpMiddleware())
 
-management_commands_set = ['Відміна', 'Змінити email',\
-                        'Змінити пароль', 'Підтвердити',\
-                        'Назад']
+management_commands_set = [__('Відміна'), __('Змінити email'),\
+                        __('Змінити пароль'), __('Підтвердити'),\
+                        __('Назад')]
 
 
 class SignUpState(StatesGroup):
@@ -43,10 +45,10 @@ class SignUpState(StatesGroup):
 
 
 # entry point for FSM
-@router.message(F.text == "Зареєструватись", flags={'entry_sing_up_flag': 'True'})
+@router.message(F.text == __("Зареєструватись"), flags={'entry_sing_up_flag': 'True'})
 async def sign_up_handler(message: types.Message, state: FSMContext):
 
-    await message.reply("Введіть свій email.", 
+    await message.reply(_("Введіть свій email."), 
                         reply_markup=cancel_keyboard())
     await state.set_state(SignUpState.users_email)
 
@@ -60,16 +62,16 @@ async def save_email(message: types.Message, state: FSMContext) -> None:
     if 'is_all_fields_filled' not in registration_data:
         await state.update_data(users_email=message.text, previouse_states=['users_email', ])
         await message.answer(
-        text="Введіть пароль",
+        text=_("Введіть пароль"),
         reply_markup=cancel_keyboard()
     )
         await state.set_state(SignUpState.users_password)
     # updating email state
     elif 'is_all_fields_filled' in registration_data:
         await state.update_data(users_email=message.text, previouse_states=['users_email', ])
-        await message.answer(text="email змінено")
+        await message.answer(text=_("email змінено"))
         await message.answer(
-            text=f"Ви бажаєте зареєструватись як {registration_data['users_email']} з паролем {registration_data['users_password']} ",
+            text="Ви бажаєте зареєструватись як {users_email} з паролем {users_password} ".format(users_email=registration_data['users_email'], users_password=registration_data['users_password']),
             reply_markup=edit_registration_data_keyboard()
             )
 
@@ -78,7 +80,7 @@ async def save_email(message: types.Message, state: FSMContext) -> None:
 @router.message(SignUpState.users_email, ~F.text.in_(management_commands_set))
 async def handling_uncorrect_email(message: types.Message, state: FSMContext) -> None:
         await message.answer(
-        text="Помилка в емейлі. Такой адресси електронної пошти не може існувати. Введіть існуючу.",
+        text=_("Помилка в емейлі. Такой адресси електронної пошти не може існувати. Введіть існуючу."),
         reply_markup=cancel_keyboard()
     )
 
@@ -91,48 +93,48 @@ async def process_password(message: types.Message, state: FSMContext) -> None:
     await state.update_data(users_password=message.text, previouse_states=new_previouse_states)
     # UPDATING password logic
     if 'is_all_fields_filled' in registration_data:
-        await message.answer(text="Ви змінили пароль")
+        await message.answer(text=_("Ви змінили пароль"))
     else:
         await state.update_data(is_all_fields_filled='true', previouse_states=previouse_states)
     registration_data = await state.get_data()
     await message.answer(
-        text=f"Ви бажаєте зареєструватись як {registration_data['users_email']} з паролем {registration_data['users_password']} ",
+        text="Ви бажаєте зареєструватись як {users_email} з паролем {users_password} ".format(users_email=registration_data['users_email'], users_password=registration_data['users_password']),
         reply_markup=edit_registration_data_keyboard()
     )
 
 
 # return to privious stage
-@router.message(F.text == "Назад")
+@router.message(F.text == __("Назад"))
 async def return_to_previous_step(message: types.Message, state: FSMContext):
 
     state_data = await state.get_data()
     previous_state = state_data['previouse_states'].pop()
 
     if previous_state == 'users_email':
-        await message.answer("Введіть свій email.")
+        await message.answer(_("Введіть свій email."))
         await state.set_state(SignUpState.users_email)
 
     if previous_state == 'users_password':
-        await message.answer("Введіть пароль.")
+        await message.answer(_("Введіть пароль."))
         await state.set_state(SignUpState.users_password)
    
 # Update data commands
-@router.message(F.text == "Змінити email")
+@router.message(F.text == __("Змінити email"))
 async def change_email(message: types.Message, state: FSMContext):
-    await message.answer("Введіть новий email")
+    await message.answer(_("Введіть новий email"))
     await state.set_state(SignUpState.users_email)   
 
-@router.message(F.text == "Змінити пароль")
+@router.message(F.text == __("Змінити пароль"))
 async def change_password(message: types.Message, state: FSMContext):
-    await message.answer("Введіть новий пароль")
+    await message.answer(__("Введіть новий пароль"))
     await state.set_state(SignUpState.users_password)   
 
-@router.message(F.text == "Відміна")
+@router.message(F.text == __("Відміна"))
 async def sign_up_cancel(message: types.Message, state: FSMContext):
 
     await state.clear()
     await message.answer(
-        text="Реєстрацію відмінено. Залогінся або зареєструйся =)",
+        text=_("Реєстрацію відмінено. Залогінся або зареєструйся =)"),
         reply_markup=make_invite_keyboard()
     )
 
@@ -142,17 +144,9 @@ db = client.rptutorial
 bot_aut_collection = db.bot_aut_collection
 
 
-@router.message(F.text == 'Підтвердити')
+@router.message(F.text == __('Підтвердити'))
 async def sign_up_confirmation(message: types.Message, state: FSMContext):
     auth_data = await state.get_data()
-
-    # ----------------NEW----CODE--------------------------------------------
-    # with httpx.Client() as client:
-    #     url = "http://127.0.0.1:8000/users/auth/register_builder_user/"
-    #     data = {"email": auth_data['users_email'], "password": auth_data['users_password']}
-    #     response = client.post(url, data=data, timeout=10.0)
-    #     response_dict = json.loads(response.text)
-
     registration_request = RegistrationRequestSwipeAPI()
     method = 'post'
     url = f"{base_url_secret}/users/auth/register_builder_user/"
@@ -164,7 +158,7 @@ async def sign_up_confirmation(message: types.Message, state: FSMContext):
 
     match response.status_code:
         case 200:
-            response_text = f"Ви зареєстровані в системі як {response_dict['email']}"
+            response_text = "Ви зареєстровані в системі як {email}".format(email=response_dict['email'])
         case 400:
             response_text = response_dict['non_field_errors'][0]
 
@@ -176,6 +170,6 @@ async def sign_up_confirmation(message: types.Message, state: FSMContext):
 
     await state.clear()
     await message.answer(
-        text="Ви успішно зареєструвалися",
+        text=_("Ви успішно зареєструвалися"),
         reply_markup=make_invite_keyboard()
     )

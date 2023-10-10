@@ -18,7 +18,8 @@ from middlewares import auth_middlewares
 
 from services.request_to_swipeapi import OrdinaryRequestSwipeAPI
 
-
+from aiogram.utils.i18n import lazy_gettext as __
+from aiogram.utils.i18n import gettext as _
 
 router = Router()
 router.message.middleware(auth_middlewares.IsAuthenticatedMiddleware())
@@ -66,7 +67,7 @@ builder_without_geo.add(types.InlineKeyboardButton(
     )
 
 # List of ads
-@router.message(F.text == "Оголошення")
+@router.message(F.text == __("Оголошення"))
 async def list_of_ads_handler(message: types.Message, middleware_access_data: Dict[str, Any] | None, state: FSMContext):
 
     auth_data = bot_aut_collection.find_one({"chat_id": message.chat.id})
@@ -134,7 +135,7 @@ async def get_next_ads(callback: types.CallbackQuery, state: FSMContext):
         ads_data = await state.get_data()
     else:
         await callback.message.answer(
-            text="Це останнє оголошення"
+            text=_("Це останнє оголошення")
         )
 
 
@@ -159,7 +160,7 @@ async def previous_next_ads(callback: types.CallbackQuery, state: FSMContext):
         await state.update_data(current_ads_index=(current_ads_index-1))
     else:
         await callback.message.answer(
-            text="Це оголошення найновіше"
+            text=_("Це оголошення найновіше")
         )
 
 

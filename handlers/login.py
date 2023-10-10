@@ -15,10 +15,12 @@ from filters.correct_email_filter import EmailValidationFilter
 from keyboards.simple_row import make_row_keyboard
 from keyboards.main_keyboard import make_main_keyboard
 from keyboards.invite_keyboard import make_invite_keyboard
-from services.request_to_swipeapi import OrdinaryRequestSwipeAPI
+from services.request_to_swipeapi import OrdinaryRequestSwipeAPI, LoginRequestSwipeAPI
 
 from filters.state_still_in_validation_filter import IsNotDefaultStateFilter
 from aiogram.filters.state import StateFilter
+from aiogram.utils.i18n import lazy_gettext as __
+from aiogram.utils.i18n import gettext as _
 
 
 from services.get_secret_values import return_secret_value
@@ -47,10 +49,10 @@ class LoginState(StatesGroup):
 
 
 # request and wait email state
-@router.message(F.text == "Увійти в бот")
+@router.message(F.text == __("Увійти в бот"))
 async def sign_in(message: types.Message, state: FSMContext):
 
-    await message.reply("Введіть емейл користувача", reply_markup=types.ReplyKeyboardRemove())
+    await message.reply(_("Введіть емейл користувача"), reply_markup=types.ReplyKeyboardRemove())
     await state.update_data(is_not_default_state='true')
     await state.set_state(LoginState.users_email)
 
@@ -60,7 +62,7 @@ async def sign_in(message: types.Message, state: FSMContext):
 async def save_email(message: Message, state: FSMContext) -> None:
     await state.update_data(users_email=message.text)
     await message.answer(
-        text="Введіть пароль"
+        text=_("Введіть пароль")
     )
     await state.set_state(LoginState.users_password)
 
@@ -68,7 +70,7 @@ async def save_email(message: Message, state: FSMContext) -> None:
 @router.message(LoginState.users_email, ~StateFilter(default_state))
 async def handling_uncorrect_email(message: Message, state: FSMContext) -> None:
         await message.answer(
-        text="Помилка в емейлі. Такой адресси електронної пошти не може існувати. Введіть існуючу."
+        text=_("Помилка в емейлі. Такой адресси електронної пошти не може існувати. Введіть існуючу.")
     )
  
 
@@ -78,7 +80,7 @@ async def process_password(message: Message, state: FSMContext) -> None:
     await state.update_data(users_password=message.text)
     auth_data = await state.get_data()
 
-    login_request = OrdinaryRequestSwipeAPI()
+    login_request = LoginRequestSwipeAPI()
     method = 'post'
     url = f"{base_url_secret}/users/auth/login_simple_user/"
     chat_id = message.chat.id
@@ -98,14 +100,14 @@ async def process_password(message: Message, state: FSMContext) -> None:
             bot_aut_collection.update_one({"chat_id": message.chat.id},\
                                         {"$set": auth_object}, upsert=True)
         
-            response_text = f"Ви увійшли в бот як {response_dict['email']}"
+            response_text = _("Ви увійшли в бот як {email}").format(email=response_dict['email'])
             await message.answer(
                 text = response_text,
                 reply_markup=make_main_keyboard()
             )
         case 400:
             await message.answer(
-                text = 'Помилка в email або в пароли',
+                text = _('Помилка в email або в пароли'),
                 reply_markup=make_invite_keyboard()
             )      
 
@@ -116,5 +118,5 @@ async def process_password(message: Message, state: FSMContext) -> None:
 @router.message(LoginState.users_password)
 async def handling_empty_password(message: Message, state: FSMContext) -> None:
         await message.answer(
-        text="Заповнення поля пароль є обов'язковим."
+        text=_("Заповнення поля пароль є обов'язковим.")
     )

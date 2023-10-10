@@ -10,6 +10,8 @@ from services.get_secret_values import return_secret_value
 from services.request_to_swipeapi import OrdinaryRequestSwipeAPI
 from aiogram.types import URLInputFile
 
+from aiogram.utils.i18n import lazy_gettext as __
+from aiogram.utils.i18n import gettext as _
 
 router = Router()
 router.message.middleware(auth_middlewares.IsAuthenticatedMiddleware())
@@ -22,17 +24,17 @@ base_url_secret = return_secret_value('BASE_URL')
 
 
 
-@router.message(F.text == "Мій профіль")
+@router.message(F.text == __("Мій профіль"))
 async def profile_main_menu(message: types.Message, middleware_access_data: Dict[str, Any] | None):
 
 
     await message.answer(
-        text='Оберіть дію',
+        text=_('Оберіть дію'),
         reply_markup=make_main_profile_keyboards()
     )
 
 
-@router.message(F.text == "Мої дані")
+@router.message(F.text == __("Мої дані"))
 async def get_user_data(message: types.Message, middleware_access_data: Dict[str, Any] | None):
     my_profile_request = OrdinaryRequestSwipeAPI()
     method = "get"
@@ -85,7 +87,7 @@ async def get_user_data(message: types.Message, middleware_access_data: Dict[str
             
 
 
-@router.message(F.text == "Мої оголошення")
+@router.message(F.text == __("Мої оголошення"))
 async def return_my_ads_list(message: types.Message, middleware_access_data: Dict[str, Any] | None):
     my_ads_list_request = OrdinaryRequestSwipeAPI()
     method = "get"

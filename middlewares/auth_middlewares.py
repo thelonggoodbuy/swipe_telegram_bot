@@ -5,7 +5,7 @@ from typing import Callable, Dict, Any, Awaitable
 from aiogram import BaseMiddleware
 from aiogram.types import Message
 
-
+from aiogram.utils.i18n import gettext as _
 
 class IsAuthenticatedMiddleware(BaseMiddleware):
     async def __call__(
@@ -23,7 +23,7 @@ class IsAuthenticatedMiddleware(BaseMiddleware):
         if user_id:
             return await handler(event, data)
         else:
-            return await event.answer(text="Ви не увійшли в систему. Будьласка увійдіть або зареєструйтеся.")
+            return await event.answer(text=_("Ви не увійшли в систему. Будьласка увійдіть або зареєструйтеся."))
 
 
 class GetJWTAuthenticationMiddleware(BaseMiddleware):
@@ -52,4 +52,4 @@ class GetJWTAuthenticationMiddleware(BaseMiddleware):
         if user_obj:
             return await handler(event, data)
         else:
-            return await event.answer(text="Користувач з такими данними є заблоковним.")
+            return await event.answer(text=_("Користувач з такими данними є заблоковним."))

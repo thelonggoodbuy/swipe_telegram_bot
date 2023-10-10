@@ -1,0 +1,165 @@
+# Ukrainian translations for PROJECT.
+# Copyright (C) 2023 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2023-10-10 17:33+0300\n"
+"PO-Revision-Date: 2023-10-09 18:48+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: uk\n"
+"Language-Team: uk <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.13.0\n"
+
+#: handlers/change_language.py:19
+msgid "Оберіть мову"
+msgstr "Chouse language"
+
+#: handlers/invite.py:17
+msgid "Привіт! Залогінся або зареєструйся =)"
+msgstr "Привіт! Залогінся або зареєструйся =)"
+
+#: handlers/list_of_ads.py:50
+msgid "показати геолокацію"
+msgstr "показати геолокацію"
+
+#: handlers/list_of_ads.py:138
+msgid "Це останнє оголошення"
+msgstr "Це останнє оголошення"
+
+#: handlers/list_of_ads.py:163
+msgid "Це оголошення найновіше"
+msgstr "Це оголошення найновіше"
+
+#: handlers/login.py:55
+msgid "Введіть емейл користувача"
+msgstr "Введіть емейл користувача"
+
+#: handlers/login.py:65 handlers/sign_up.py:65
+msgid "Введіть пароль"
+msgstr "Введіть пароль"
+
+#: handlers/login.py:73 handlers/sign_up.py:83
+msgid ""
+"Помилка в емейлі. Такой адресси електронної пошти не може існувати. "
+"Введіть існуючу."
+msgstr ""
+"Помилка в емейлі. Такой адресси електронної пошти не може існувати. "
+"Введіть існуючу."
+
+#: handlers/login.py:103
+msgid "Ви увійшли в бот як {email}"
+msgstr "Ви увійшли в бот як {email}"
+
+#: handlers/login.py:110
+msgid "Помилка в email або в пароли"
+msgstr "Помилка в email або в пароли"
+
+#: handlers/login.py:121
+msgid "Заповнення поля пароль є обов'язковим."
+msgstr "Заповнення поля пароль є обов'язковим."
+
+#: handlers/main_menu.py:18
+msgid "Головне меню"
+msgstr "Головне меню"
+
+#: handlers/my_profile.py:32
+msgid "Оберіть дію"
+msgstr "Оберіть дію"
+
+#: handlers/sign_up.py:51 handlers/sign_up.py:114
+msgid "Введіть свій email."
+msgstr "Введіть свій email."
+
+#: handlers/sign_up.py:72
+msgid "email змінено"
+msgstr "email змінено"
+
+#: handlers/sign_up.py:96
+msgid "Ви змінили пароль"
+msgstr "Ви змінили пароль"
+
+#: handlers/sign_up.py:118
+msgid "Введіть пароль."
+msgstr "Введіть пароль"
+
+#: handlers/sign_up.py:124
+msgid "Введіть новий email"
+msgstr "Введіть новий email"
+
+#: handlers/sign_up.py:137
+msgid "Реєстрацію відмінено. Залогінся або зареєструйся =)"
+msgstr "Реєстрацію відмінено. Залогінся або зареєструйся =)"
+
+#: handlers/sign_up.py:173
+msgid "Ви успішно зареєструвалися"
+msgstr "Ви успішно зареєструвалися"
+
+#: keyboards/cancel_keyboard.py:10
+msgid "Назад"
+msgstr "Назад"
+
+#: keyboards/cancel_keyboard.py:13 keyboards/sign_up_update_keyboard.py:12
+msgid "Відміна"
+msgstr "Відміна"
+
+#: keyboards/invite_keyboard.py:11
+msgid "Увійти в бот"
+msgstr "Увійти в бот"
+
+#: keyboards/invite_keyboard.py:14
+msgid "Зареєструватись"
+msgstr "Зареєструватись"
+
+#: keyboards/invite_keyboard.py:17 keyboards/main_keyboard.py:21
+msgid "Змінити мову"
+msgstr "Змінити мову"
+
+#: keyboards/main_keyboard.py:12
+msgid "Оголошення"
+msgstr "Оголошення"
+
+#: keyboards/main_keyboard.py:15
+msgid "Створити оголошення"
+msgstr "Створити оголошення"
+
+#: keyboards/main_keyboard.py:18
+msgid "Мій профіль"
+msgstr "Мій профіль"
+
+#: keyboards/main_my_profile_keyboard.py:12
+msgid "Мої оголошення"
+msgstr "Мої оголошення"
+
+#: keyboards/main_my_profile_keyboard.py:15
+msgid "Мої дані"
+msgstr "Мої дані"
+
+#: keyboards/sign_up_update_keyboard.py:15
+msgid "Змінити email"
+msgstr "Змінити email"
+
+#: keyboards/sign_up_update_keyboard.py:18
+msgid "Змінити пароль"
+msgstr "Змінити пароль"
+
+#: keyboards/sign_up_update_keyboard.py:21
+msgid "Підтвердити"
+msgstr "Підтвердити"
+
+#: middlewares/auth_middlewares.py:26
+msgid "Ви не увійшли в систему. Будьласка увійдіть або зареєструйтеся."
+msgstr "Ви не увійшли в систему. Будьласка увійдіть або зареєструйтеся."
+
+#: middlewares/auth_middlewares.py:55
+msgid "Користувач з такими данними є заблоковним."
+msgstr "Користувач з такими данними є заблоковним."
+

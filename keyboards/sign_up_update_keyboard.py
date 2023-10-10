@@ -2,20 +2,22 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from aiogram import types
 
+from aiogram.utils.i18n import gettext as _
+
 def edit_registration_data_keyboard() -> ReplyKeyboardMarkup:
         
     builder = ReplyKeyboardBuilder()
 
     builder.add(types.KeyboardButton(
-        text='Відміна'
+        text=_('Відміна')
     ))
     builder.add(types.KeyboardButton(
-        text='Змінити email'
+        text=_('Змінити email')
     ))
     builder.add(types.KeyboardButton(
-        text='Змінити пароль'
+        text=_('Змінити пароль')
     ))
     builder.add(types.KeyboardButton(
-        text='Підтвердити'
+        text=_('Підтвердити')
     ))
     return builder.as_markup(resize_keyboard=True)
