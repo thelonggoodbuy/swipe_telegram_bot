@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-10-10 17:33+0300\n"
+"POT-Creation-Date: 2023-10-10 23:03+0300\n"
 "PO-Revision-Date: 2023-10-10 17:10+0300\n"
 "Last-Translator: \n"
 "Language: en\n"
@@ -26,16 +26,12 @@ msgstr "Choose a language"
 msgid "Привіт! Залогінся або зареєструйся =)"
 msgstr "Hello! Login or register =)"
 
-#: handlers/list_of_ads.py:50
-msgid "показати геолокацію"
-msgstr "show geolocation"
-
-#: handlers/list_of_ads.py:138
+#: handlers/list_of_ads.py:138 handlers/my_profile.py:219
 #, fuzzy
 msgid "Це останнє оголошення"
 msgstr "My ads"
 
-#: handlers/list_of_ads.py:163
+#: handlers/list_of_ads.py:163 handlers/my_profile.py:260
 msgid "Це оголошення найновіше"
 msgstr "This ad is the most recent"
 
@@ -65,11 +61,11 @@ msgstr "Error in email or passwords"
 msgid "Заповнення поля пароль є обов'язковим."
 msgstr "Filling in the password field is mandatory."
 
-#: handlers/main_menu.py:18
+#: handlers/main_menu.py:18 handlers/my_profile.py:268
 msgid "Головне меню"
 msgstr "Main menu"
 
-#: handlers/my_profile.py:32
+#: handlers/my_profile.py:51
 msgid "Оберіть дію"
 msgstr "Choose an action"
 
@@ -143,6 +139,10 @@ msgstr "My ads"
 msgid "Мої дані"
 msgstr "My data"
 
+#: keyboards/main_my_profile_keyboard.py:18
+msgid "Попереднє меню"
+msgstr "Previous menu"
+
 #: keyboards/sign_up_update_keyboard.py:15
 msgid "Змінити email"
 msgstr "Change email"
@@ -162,4 +162,7 @@ msgstr "You are not logged in. Please login or register."
 #: middlewares/auth_middlewares.py:55
 msgid "Користувач з такими данними є заблоковним."
 msgstr "A user with such data is unblockable."
+
+#~ msgid "показати геолокацію"
+#~ msgstr "show geolocation"
 

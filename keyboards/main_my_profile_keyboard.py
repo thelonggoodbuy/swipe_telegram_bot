@@ -14,7 +14,7 @@ def make_main_profile_keyboards() -> ReplyKeyboardMarkup:
     builder.add(types.KeyboardButton(
         text=_('Мої дані')
     ))
-    # builder.add(types.KeyboardButton(
-    #     text='Список оголошень'
-    # ))
+    builder.add(types.KeyboardButton(
+        text=_('Попереднє меню')
+    ))
     return builder.as_markup(resize_keyboard=True)

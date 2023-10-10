@@ -65,7 +65,7 @@ builder_without_geo.add(types.InlineKeyboardButton(
         text=">>",
         callback_data="next_ads")
     )
-
+# --------------------------------------------------------------------------
 # List of ads
 @router.message(F.text == __("Оголошення"))
 async def list_of_ads_handler(message: types.Message, middleware_access_data: Dict[str, Any] | None, state: FSMContext):

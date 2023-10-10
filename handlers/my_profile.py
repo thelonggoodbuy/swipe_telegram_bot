@@ -2,10 +2,13 @@ from aiogram import F, Router, types
 from typing import Dict, Any
 
 import json
+from aiogram.fsm.state import State, StatesGroup
 
 from keyboards.main_my_profile_keyboard import make_main_profile_keyboards
+from keyboards.main_keyboard import make_main_keyboard
 from middlewares import auth_middlewares
 from services.get_secret_values import return_secret_value
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from services.request_to_swipeapi import OrdinaryRequestSwipeAPI
 from aiogram.types import URLInputFile
@@ -20,7 +23,23 @@ router.message.middleware(auth_middlewares.GetJWTAuthenticationMiddleware())
 mongo_url_secret = return_secret_value('MONGO_URL')
 base_url_secret = return_secret_value('BASE_URL')
 
+class AdsFeedState(StatesGroup):
+    total_ads = State()
+    total_ads_quantity = State()
+    current_ads_index = State()
 
+
+
+builder_without_geo = InlineKeyboardBuilder()
+
+builder_without_geo.add(types.InlineKeyboardButton(
+        text="<<",
+        callback_data="previous_my_ads")
+    )
+builder_without_geo.add(types.InlineKeyboardButton(
+        text=">>",
+        callback_data="next_my_ads")
+    )
 
 
 
@@ -85,21 +104,167 @@ async def get_user_data(message: types.Message, middleware_access_data: Dict[str
                 text=f"{response.text}"
                 )
             
+import json
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.fsm.context import FSMContext
+from pymongo import MongoClient
 
+client = MongoClient(mongo_url_secret)
+db = client.rptutorial
+bot_aut_collection = db.bot_aut_collection
+# -----------------------------------------------------------------------------
+# =============================================================================
+# *****************************************************************************
 
 @router.message(F.text == __("Мої оголошення"))
-async def return_my_ads_list(message: types.Message, middleware_access_data: Dict[str, Any] | None):
-    my_ads_list_request = OrdinaryRequestSwipeAPI()
-    method = "get"
-    # user_id = middleware_access_data['user_id']
+async def list_of_my_ads_handler(message: types.Message, middleware_access_data: Dict[str, Any] | None, state: FSMContext):
+    auth_data = bot_aut_collection.find_one({"chat_id": message.chat.id})
+    ads_request = OrdinaryRequestSwipeAPI()
+    method = 'get'
     url = f"{base_url_secret}/ads/ads/"
     chat_id = message.chat.id
-    my_profile_dictionary = {"headers":{
-        'Authorization': f"Bearer {middleware_access_data['access_token']}"
+    ads_dict = {"headers":{
+        'Authorization': f"Bearer {auth_data['access_token']}"
     }}
-    response = my_ads_list_request(method, url, chat_id, **my_profile_dictionary)
+    #---------------------------------------------------------------------------------
+    response = ads_request(method, url, chat_id, **ads_dict)
+    match response.status_code:
+        case 200:
+            result = json.loads(response.text)
+            await state.update_data(total_ads=result,
+                                    total_ads_quantity=len(result),
+                                    current_ads_index=0)
+            
+            ads_data = await state.get_data()
+            image_url = f"{ base_url_secret + ads_data['total_ads'][0]['accomodation_data']['main_image']}"
+            image_from_url = URLInputFile(image_url)
+
+            # ====================================
+            ads = ads_data['total_ads'][0]
+            answer = ""
+            house = ads['accomodation_data']['address']
+            answer += "\nБудинок за адрессою {house}".format(house=house)
+            floor = ads['accomodation_data']['floor']
+            answer += "\nповерх {floor}".format(floor=floor)
+            total_floors = ads['accomodation_data']['total_floors']
+            answer += "\nвсього поверхів {total_floors}".format(total_floors=total_floors)
+            area = ads['accomodation_data']['area']
+            answer += "\nплоща {area}".format(area=area)
+            cost = ads['cost']
+            answer += "\nціна {cost}".format(cost=cost)
+            description = ads['description']
+            answer += "\nопис {description}".format(description=description)
+            # ====================================
+
+            await message.answer_photo(
+                image_from_url,
+                caption=answer,
+                reply_markup=builder_without_geo.as_markup()
+            )     
+            await message.answer(
+            text=f"{1} з {len(result)}"
+                )
+            second_ads_id = ads_data['current_ads_index'] + 1
+            await state.update_data(total_ads=result,
+                                    total_ads_quantity=len(result),
+                                    current_ads_index=second_ads_id)
+
+        case 400:
+            response_text = response.text
+            await message.answer(
+            text = str(response_text),
+            reply_markup=make_main_profile_keyboards()
+            )
+
+
+
+@router.callback_query(F.data == "next_my_ads")
+async def get_next_ads(callback: types.CallbackQuery, state: FSMContext):
+    ads_data = await state.get_data()
+    current_ads_index = ads_data['current_ads_index']
+    last_ads_index = ads_data['total_ads_quantity']
+    all_ads = ads_data['total_ads']
+
+    if current_ads_index < last_ads_index:
+        image_url = f"{ base_url_secret + all_ads[current_ads_index]['accomodation_data']['main_image']}"
+        image_from_url = URLInputFile(image_url)
+# ------------------------------------------------------------------------------------------------------------
+        ads = all_ads[current_ads_index]
+        answer = ""
+        house = ads['accomodation_data']['address']
+        answer += "\nБудинок за адрессою {house}".format(house=house)
+        floor = ads['accomodation_data']['floor']
+        answer += "\nповерх {floor}".format(floor=floor)
+        total_floors = ads['accomodation_data']['total_floors']
+        answer += "\nвсього поверхів {total_floors}".format(total_floors=total_floors)
+        area = ads['accomodation_data']['area']
+        answer += "\nплоща {area}".format(area=area)
+        cost = ads['cost']
+        answer += "\nціна {cost}".format(cost=cost)
+        description = ads['description']
+        answer += "\nопис {description}".format(description=description)
+# ------------------------------------------------------------------------------------------------------------
+        await callback.message.answer_photo(
+            image_from_url,
+            caption=answer,
+            reply_markup=builder_without_geo.as_markup()
+        )
+        await callback.message.answer(
+            text=f"{current_ads_index+1} з {last_ads_index}"
+        )
+        await state.update_data(current_ads_index=(current_ads_index+1))
+        ads_data = await state.get_data()
+    else:
+        await callback.message.answer(
+            text=_("Це останнє оголошення")
+        )
+
+
+@router.callback_query(F.data == "previous_my_ads")
+async def previous_next_ads(callback: types.CallbackQuery, state: FSMContext):
+    ads_data = await state.get_data()
+    current_ads_index = ads_data['current_ads_index']
+    last_ads_index = ads_data['total_ads_quantity']
+    all_ads = ads_data['total_ads']
+
+    if current_ads_index > 1:
+        image_url = f"{ base_url_secret + all_ads[current_ads_index-2]['accomodation_data']['main_image']}"
+        image_from_url = URLInputFile(image_url)
+# ------------------------------------------------------------------------------------------------------------
+        ads = all_ads[current_ads_index-2]
+        answer = ""
+        house = ads['accomodation_data']['address']
+        answer += "\nБудинок за адрессою {house}".format(house=house)
+        floor = ads['accomodation_data']['floor']
+        answer += "\nповерх {floor}".format(floor=floor)
+        total_floors = ads['accomodation_data']['total_floors']
+        answer += "\nвсього поверхів {total_floors}".format(total_floors=total_floors)
+        area = ads['accomodation_data']['area']
+        answer += "\nплоща {area}".format(area=area)
+        cost = ads['cost']
+        answer += "\nціна {cost}".format(cost=cost)
+        description = ads['description']
+        answer += "\nопис {description}".format(description=description)
+# ------------------------------------------------------------------------------------------------------------
+        await callback.message.answer_photo(
+            image_from_url,
+            caption=answer,
+            reply_markup=builder_without_geo.as_markup()
+        )
+        await callback.message.answer(
+            text=f"{current_ads_index-1} з {last_ads_index}"
+        )
+        await state.update_data(current_ads_index=(current_ads_index-1))
+    else:
+        await callback.message.answer(
+            text=_("Це оголошення найновіше")
+        )
+
+
+@router.message(F.text == __('Попереднє меню'))
+async def go_to_main_menu(message: types.Message, state: FSMContext):
+    await state.clear()
     await message.answer(
-        text=response.text,
-        reply_markup=make_main_profile_keyboards()
+        text=_("Головне меню"),
+        reply_markup=make_main_keyboard()
     )
-    
