@@ -13,9 +13,9 @@ def make_invite_keyboard() -> ReplyKeyboardMarkup:
     builder.add(types.KeyboardButton(
         text=_('Зареєструватись')
     ))
-    builder.add(types.KeyboardButton(
-        text=_('Змінити мову')
-    ))
+    # builder.add(types.KeyboardButton(
+    #     text=_('Змінити мову')
+    # ))
     return builder.as_markup(resize_keyboard=True)
 
 
@@ -27,9 +27,9 @@ def make_invite_keyboard_uk() -> ReplyKeyboardMarkup:
     builder.add(types.KeyboardButton(
         text='Зареєструватись'
     ))
-    builder.add(types.KeyboardButton(
-        text='Змінити мову'
-    ))
+    # builder.add(types.KeyboardButton(
+    #     text='Змінити мову'
+    # ))
     return builder.as_markup(resize_keyboard=True)
 
 def make_invite_keyboard_en() -> ReplyKeyboardMarkup:
@@ -40,7 +40,7 @@ def make_invite_keyboard_en() -> ReplyKeyboardMarkup:
     builder.add(types.KeyboardButton(
         text='Sign Up'
     ))
-    builder.add(types.KeyboardButton(
-        text='Change Language'
-    ))
+    # builder.add(types.KeyboardButton(
+    #     text='Change Language'
+    # ))
     return builder.as_markup(resize_keyboard=True)
