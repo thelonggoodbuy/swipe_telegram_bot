@@ -54,5 +54,8 @@ def save_or_change_ads_kayboard() -> ReplyKeyboardMarkup:
     builder.add(types.KeyboardButton(
         text='зберігти оголошення'
     ))
-    builder.adjust(2, 2, 1)
+    builder.add(types.KeyboardButton(
+        text='відміна'
+    ))
+    builder.adjust(2, 2, 1, )
     return builder.as_markup(resize_keyboard=True)
