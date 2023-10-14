@@ -24,10 +24,12 @@ mongo_url_secret = return_secret_value('MONGO_URL')
 base_url_secret = return_secret_value('BASE_URL')
 
 class AdsFeedState(StatesGroup):
+    # data states
     total_ads = State()
     total_ads_quantity = State()
     current_ads_index = State()
-
+    # utility states
+    message_id_ads_quantity = State()
 
 
 builder_without_geo = InlineKeyboardBuilder()
@@ -139,7 +141,6 @@ async def list_of_my_ads_handler(message: types.Message, middleware_access_data:
             image_url = f"{ base_url_secret + ads_data['total_ads'][0]['accomodation_data']['main_image']}"
             image_from_url = URLInputFile(image_url)
 
-            # ====================================
             ads = ads_data['total_ads'][0]
             answer = ""
             house = ads['accomodation_data']['address']
@@ -154,16 +155,28 @@ async def list_of_my_ads_handler(message: types.Message, middleware_access_data:
             answer += "\nціна {cost}".format(cost=cost)
             description = ads['description']
             answer += "\nопис {description}".format(description=description)
-            # ====================================
 
             await message.answer_photo(
                 image_from_url,
                 caption=answer,
                 reply_markup=builder_without_geo.as_markup()
             )     
-            await message.answer(
+
+            # ====================================
+            current_message = await message.answer(
             text=f"{1} з {len(result)}"
                 )
+            
+            # print('------------test-------------data--------------')
+            # print(current_message.message_id)
+            await state.update_data(message_id_ads_quantity=current_message.message_id)
+            # print(current_message.__dict__)
+            # print('-----------------------------------------------')
+            # await message.answer(
+            # f'current_message is {current_message["message_id"]}'
+            #     )
+            # ====================================
+
             second_ads_id = ads_data['current_ads_index'] + 1
             await state.update_data(total_ads=result,
                                     total_ads_quantity=len(result),
@@ -184,11 +197,12 @@ async def get_next_ads(callback: types.CallbackQuery, state: FSMContext):
     current_ads_index = ads_data['current_ads_index']
     last_ads_index = ads_data['total_ads_quantity']
     all_ads = ads_data['total_ads']
+    message_id = ads_data['message_id_ads_quantity']
 
     if current_ads_index < last_ads_index:
         image_url = f"{ base_url_secret + all_ads[current_ads_index]['accomodation_data']['main_image']}"
         image_from_url = URLInputFile(image_url)
-# ------------------------------------------------------------------------------------------------------------
+
         ads = all_ads[current_ads_index]
         answer = ""
         house = ads['accomodation_data']['address']
@@ -203,15 +217,26 @@ async def get_next_ads(callback: types.CallbackQuery, state: FSMContext):
         answer += "\nціна {cost}".format(cost=cost)
         description = ads['description']
         answer += "\nопис {description}".format(description=description)
-# ------------------------------------------------------------------------------------------------------------
         await callback.message.answer_photo(
             image_from_url,
             caption=answer,
             reply_markup=builder_without_geo.as_markup()
         )
-        await callback.message.answer(
-            text=f"{current_ads_index+1} з {last_ads_index}"
+
+        edited_text = f"{current_ads_index+1} з {last_ads_index}"
+# ------------------------------------------------------------------------------------------------------------
+        print('CALLBACK FOR EDIR')
+        print(callback.message)
+        print('-----------------')
+        print(message_id)
+        print('-----------------')
+# -----------------------------------------------------------------------------------------------------------
+        await callback.message.edit_text(
+            text=edited_text,
+            message_id=int(message_id)
         )
+# ------------------------------------------------------------------------------------------------------------
+
         await state.update_data(current_ads_index=(current_ads_index+1))
         ads_data = await state.get_data()
     else:
