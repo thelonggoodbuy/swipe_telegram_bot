@@ -81,6 +81,9 @@ async def list_of_ads_handler(message: types.Message, middleware_access_data: Di
         'Authorization': f"Bearer {auth_data['access_token']}"
     }}
     response = ads_request(method, url, chat_id, **ads_dict)
+    print('------------------------')
+    print(response)
+    print('------------------------')
     match response.status_code:
         case 200:
             result = json.loads(response.text)

@@ -27,7 +27,11 @@ async def main():
     dp = Dispatcher(storage=redis_storage)
 
     dp.message.outer_middleware(LanguageMiddleware(i18n))
-    dp.inline_query.outer_middleware(LanguageMiddleware(i18n))
+    dp.callback_query.outer_middleware(LanguageMiddleware(i18n))
+
+    # dp.message.outer_middleware(LocaleMiddleware(i18n))
+    # dp.callback_query.outer_middleware(LocaleMiddleware(i18n))
+
 
     dp.include_router(invite.router)
     dp.include_router(login.router)
