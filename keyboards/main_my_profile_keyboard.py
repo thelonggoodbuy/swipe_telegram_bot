@@ -1,10 +1,9 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import ReplyKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from aiogram import types
 from aiogram.utils.i18n import gettext as _
 
 def make_main_profile_keyboards() -> ReplyKeyboardMarkup:
-    # row = [KeyboardButton(text=item) for item in items]
     
     builder = ReplyKeyboardBuilder()
 

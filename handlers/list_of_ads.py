@@ -91,15 +91,16 @@ async def list_of_ads_handler(message: types.Message, middleware_access_data: Di
             first_ads = await state.get_data()
             image_url = f"{ base_url_secret + first_ads['total_ads'][0]['accomodation_data']['main_image']}"
             image_from_url = URLInputFile(image_url)
+            new_caption = f"{first_ads['total_ads'][0]['description']}" + f"\n\n1 з {len(result)}"
 
             await message.answer_photo(
                 image_from_url,
-                caption=first_ads['total_ads'][0]['description'],
+                caption=new_caption,
                 reply_markup=builder.as_markup()
             )     
-            await message.answer(
-            text=f"{1} з {len(result)}"
-                )
+            # await message.answer(
+            # text=f"{1} з {len(result)}"
+            #     )
             second_ads_id = first_ads['current_ads_index'] + 1
             await state.update_data(total_ads=result,
                                     total_ads_quantity=len(result),
@@ -113,6 +114,8 @@ async def list_of_ads_handler(message: types.Message, middleware_access_data: Di
             )
 
 
+
+from aiogram.types import InputMediaPhoto
 @router.callback_query(F.data == "next_ads")
 async def get_next_ads(callback: types.CallbackQuery, state: FSMContext):
     ads_data = await state.get_data()
@@ -123,14 +126,20 @@ async def get_next_ads(callback: types.CallbackQuery, state: FSMContext):
     if current_ads_index < last_ads_index:
         image_url = f"{ base_url_secret + all_ads[current_ads_index]['accomodation_data']['main_image']}"
         image_from_url = URLInputFile(image_url)
-        await callback.message.answer_photo(
-            image_from_url,
-            caption=all_ads[current_ads_index]['description'],
+
+        await callback.message.edit_media(
+            media=InputMediaPhoto(
+                media=image_from_url
+            )
+        )
+
+        new_caption = f"{all_ads[current_ads_index]['description']}" + f"\n\n{current_ads_index+1} з {last_ads_index}"
+
+        await callback.message.edit_caption(
+            caption=new_caption,
             reply_markup=builder.as_markup()
         )
-        await callback.message.answer(
-            text=f"{current_ads_index+1} з {last_ads_index}"
-        )
+
         await state.update_data(current_ads_index=(current_ads_index+1))
         ads_data = await state.get_data()
     else:
@@ -149,14 +158,27 @@ async def previous_next_ads(callback: types.CallbackQuery, state: FSMContext):
     if current_ads_index > 1:
         image_url = f"{ base_url_secret + all_ads[current_ads_index-2]['accomodation_data']['main_image']}"
         image_from_url = URLInputFile(image_url)
-        await callback.message.answer_photo(
-            image_from_url,
-            caption=all_ads[current_ads_index-2]['description'],
+
+        await callback.message.edit_media(
+            media=InputMediaPhoto(
+                media=image_from_url
+            )
+        )
+        new_caption = f"{all_ads[current_ads_index-2]['description']}" + f"\n\n{current_ads_index-1} з {last_ads_index}"
+
+        await callback.message.edit_caption(
+            caption=new_caption,
             reply_markup=builder.as_markup()
         )
-        await callback.message.answer(
-            text=f"{current_ads_index-1} з {last_ads_index}"
-        )
+
+        # await callback.message.answer_photo(
+        #     image_from_url,
+        #     caption=all_ads[current_ads_index-2]['description'],
+        #     reply_markup=builder.as_markup()
+        # )
+        # await callback.message.answer(
+        #     text=f"{current_ads_index-1} з {last_ads_index}"
+        # )
         await state.update_data(current_ads_index=(current_ads_index-1))
     else:
         await callback.message.answer(
