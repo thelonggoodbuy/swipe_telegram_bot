@@ -13,11 +13,6 @@ class LanguageMiddleware(I18nMiddleware):
         auth_db = auth_pymongo_client.rptutorial
         auth_collection = auth_db.bot_aut_collection
 
-        print('---------------EVENT IN MIDDLEWARE------------------------')
-        # print(event.message.chat)
-        print(type(event))
-        print('----------------------------------------------------------')
-
         match type(event):
             case types.Message:
                 chat_id = event.chat.id

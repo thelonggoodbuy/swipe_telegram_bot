@@ -173,15 +173,7 @@ async def previous_next_ads(callback: types.CallbackQuery, state: FSMContext):
             caption=new_caption,
             reply_markup=builder.as_markup()
         )
-
-        # await callback.message.answer_photo(
-        #     image_from_url,
-        #     caption=all_ads[current_ads_index-2]['description'],
-        #     reply_markup=builder.as_markup()
-        # )
-        # await callback.message.answer(
-        #     text=f"{current_ads_index-1} з {last_ads_index}"
-        # )
+        
         await state.update_data(current_ads_index=(current_ads_index-1))
     else:
         await callback.message.answer(
