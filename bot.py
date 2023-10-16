@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 
 from aiogram import Bot, Dispatcher
-from handlers import invite, login, sign_up, list_of_ads, main_menu, my_profile, change_language, add_ads
+from handlers import invite, login, sign_up, list_of_ads, main_menu, my_profile, change_language, add_ads, add_appartment
 from services.get_secret_values import return_secret_value
 from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.utils.i18n import I18n
@@ -41,6 +41,7 @@ async def main():
     dp.include_router(my_profile.router)
     dp.include_router(change_language.router)
     dp.include_router(add_ads.router)
+    dp.include_router(add_appartment.router)
 
     await bot.delete_webhook(drop_pending_updates=True)
 

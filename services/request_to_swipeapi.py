@@ -2,11 +2,7 @@ import httpx
 import json
 
 from pymongo import MongoClient
-
 from services.get_secret_values import return_secret_value
-
-import time
-
 
 mongo_url_secret = return_secret_value('MONGO_URL')
 base_url_secret = return_secret_value('BASE_URL')
@@ -16,8 +12,6 @@ db = client.rptutorial
 bot_aut_collection = db.bot_aut_collection
 
 
-
-import time
 
 class OrdinaryRequestSwipeAPI():
     def __call__(self, method, url, chat_id, **kwargs):
@@ -32,14 +26,12 @@ class OrdinaryRequestSwipeAPI():
         response = getattr(client, method)(url, **kwargs)
         match response.status_code:
             case 401:
-                print('---FIRST---401---')
                 return self.handling_401(method, url, client, chat_id, auth_data, **kwargs)
             case _:
                 return response
 
 
     def handling_401(self, method, url, client, chat_id, auth_data, **kwargs):
-        print('---------REFRESH-----------')
         data = {'refresh': auth_data['refresh_token']}
         refresh_url = f"{base_url_secret}/api/token/refresh/"
         response = client.post(refresh_url, data=data, timeout=10.0)
@@ -51,16 +43,8 @@ class OrdinaryRequestSwipeAPI():
                                     {"$set": {"access_token": new_access_token}}, upsert=False)
             
             auth_data = bot_aut_collection.find_one({"chat_id": chat_id})
-
-            # client.headers['Authorization'] = f"Bearer {auth_data['access_token']}"
-
-            print('----------------NEW------TOKEN--------------')
-            print(auth_data['access_token'])
-            print('--------------------------------------------')
             headers = {'Authorization': f"Bearer {auth_data['access_token']}"}
             response = client.get(url, headers=headers, timeout=10.0)
-            # response = getattr(client, method)(url, **kwargs)
-
             return response
         
 
