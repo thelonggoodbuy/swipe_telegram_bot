@@ -12,6 +12,7 @@ from aiogram.fsm.context import FSMContext
 from keyboards.create_appartment_keyboard import choose_house_keyboard, choose_house_subordinate_obj_kb, choose_from_accomodation_model_dict_kb
 from keyboards.create_ads_keyboard import create_ads_keyboard
 
+from middlewares.stop_media_group_replication_middleware import StopMediaGroupReplicationMiddleware
 
 
 mongo_url_secret = return_secret_value('MONGO_URL')
@@ -84,6 +85,12 @@ db = client.rptutorial
 bot_aut_collection = db.bot_aut_collection
 
 router = Router()
+
+
+
+router.message.outer_middleware(StopMediaGroupReplicationMiddleware())
+
+
 
 
 @router.message(F.text == 'Додати квартиру')
@@ -386,13 +393,13 @@ async def get_appartment_schema(message: types.Message, state: FSMContext):
 
 
 # принимаем дополнительные фото и даем результаты
-@router.message(AccomodationState.appartment_addition_images, ~F.text.in_(management_commands_set), F.media_group)
+@router.message(AccomodationState.appartment_addition_images, ~F.text.in_(management_commands_set))
 async def get_additional_photo(message: types.Message, state: FSMContext):
 
-    print('===========================================')
-    pprint.pprint(message.media_group_id)
-    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-    print('===========================================')
+
+    print('=========MEDIA====GROUP==========')
+    pprint.pprint(message.__dict__)
+    print('=================================')
 
     data = await state.get_data()
     str_data = str(data)
@@ -400,9 +407,12 @@ async def get_additional_photo(message: types.Message, state: FSMContext):
         text=f'Відомості про стани\n\n{str_data}',
         reply_markup=choose_from_accomodation_model_dict_kb(heat_type_dict)
     )
-    # await message.reply_photo(
-    #     message.photo[-1].file_id
-    # )
+
+
+
+
+
+
 
 
 
