@@ -22,7 +22,6 @@ def choose_house_keyboard(obj_list) -> ReplyKeyboardMarkup:
 def choose_house_subordinate_obj_kb(obj_list) -> ReplyKeyboardMarkup:
     builder = ReplyKeyboardBuilder()
     for obj in obj_list:
-        # get first key
         obj_title = next(iter(obj))
         builder.add(types.KeyboardButton(
             text=obj_title
@@ -34,7 +33,19 @@ def choose_house_subordinate_obj_kb(obj_list) -> ReplyKeyboardMarkup:
     return builder.as_markup(resize_keyboard=True)
 
 
+def choose_from_accomodation_model_dict_kb(obj_dict):
+    builder = ReplyKeyboardBuilder()
+    for obj in obj_dict.keys():
+        builder.add(types.KeyboardButton(
+        text=obj
+        ))
+    builder.add(types.KeyboardButton(
+            text=f'Зробити оголошення з існуючою квартирою'
+        ))
+    builder.adjust(2, 3)
+    return builder.as_markup(resize_keyboard=True)
 
+    # for obj_list
 
 
 # def choose_version_of_calculation() -> ReplyKeyboardMarkup:
