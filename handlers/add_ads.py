@@ -201,16 +201,12 @@ async def save_or_update_menu(message: types.Message, state: FSMContext) -> None
 
 @router.message(F.text == "зберігти оголошення")
 async def save_ads(message: types.Message, state: FSMContext) -> None:
-    #  await message.answer(
-    #     text="Ти хочешь зберегти оголошення",
-    #     reply_markup = save_or_change_ads_kayboard()
-    # )     
+
      
     create_ads_request = OrdinaryRequestSwipeAPI()
     method = 'post'
     url = f"{base_url_secret}/ads/ads/"
     chat_id = message.chat.id
-    # -----------------------------------
     ads_dictionary = await state.get_data()
 
     cost = ads_dictionary['cost']

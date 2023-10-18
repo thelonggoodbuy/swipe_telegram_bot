@@ -45,42 +45,38 @@ def choose_from_accomodation_model_dict_kb(obj_dict):
     builder.adjust(2, 3)
     return builder.as_markup(resize_keyboard=True)
 
-    # for obj_list
 
-
-# def choose_version_of_calculation() -> ReplyKeyboardMarkup:
-#     builder = ReplyKeyboardBuilder()
-#     builder.add(types.KeyboardButton(
-#         text='кредит'
-#     ))
-#     builder.add(types.KeyboardButton(
-#         text='тільки готівка'
-#     ))
-#     builder.add(types.KeyboardButton(
-#         text='іпотека'
-#     ))
-#     return builder.as_markup(resize_keyboard=True)
-
-
-# def save_or_change_ads_kayboard() -> ReplyKeyboardMarkup:
-#     builder = ReplyKeyboardBuilder()
-#     builder.add(types.KeyboardButton(
-#         text='змінити вартість'
-#     ))
-#     builder.add(types.KeyboardButton(
-#         text='зміники коміссію агента'
-#     ))
-#     builder.add(types.KeyboardButton(
-#         text='змінити тип оплати'
-#     ))
-#     builder.add(types.KeyboardButton(
-#         text='змінити опис'
-#     ))
-#     builder.add(types.KeyboardButton(
-#         text='зберігти оголошення'
-#     ))
-#     builder.add(types.KeyboardButton(
-#         text='відміна'
-#     ))
-#     builder.adjust(2, 2, 1, )
-#     return builder.as_markup(resize_keyboard=True)
+def save_or_change_accomodation_kb() -> ReplyKeyboardMarkup:
+    builder = ReplyKeyboardBuilder()
+    builder.add(types.KeyboardButton(
+        text='змінити будинок і розташування квартири'
+    ))
+    builder.add(types.KeyboardButton(
+        text='зміники номер квартири'
+    ))
+    builder.add(types.KeyboardButton(
+        text='змінити тип нерухомості'
+    ))
+    builder.add(types.KeyboardButton(
+        text='змінити тип планування'
+    ))
+    builder.add(types.KeyboardButton(
+        text='змінити життєві умови'
+    ))
+    builder.add(types.KeyboardButton(
+        text='змінити тип опалення'
+    ))
+    builder.add(types.KeyboardButton(
+        text='змінити схему квартири'
+    ))
+    builder.add(types.KeyboardButton(
+        text='змінити фотографії'
+    ))
+    builder.add(types.KeyboardButton(
+        text='зберігти квартиру'
+    ))
+    builder.add(types.KeyboardButton(
+        text='відміна'
+    ))
+    builder.adjust(3, 3)
+    return builder.as_markup(resize_keyboard=True)
