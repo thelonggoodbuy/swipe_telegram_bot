@@ -30,6 +30,7 @@ class AdsFeedState(StatesGroup):
     current_ads_index = State()
     # utility states
     message_id_ads_quantity = State()
+    warning_message_id = State()
 
 
 builder_without_geo = InlineKeyboardBuilder()
@@ -182,6 +183,10 @@ async def get_next_ads(callback: types.CallbackQuery, state: FSMContext):
     all_ads = ads_data['total_ads']
 
     if current_ads_index < last_ads_index:
+        if 'warning_message_id' in ads_data and ads_data['warning_message_id'] != None:
+            await callback.message.bot.delete_message(chat_id=callback.message.chat.id,
+                                                message_id=ads_data['warning_message_id'])
+            await state.update_data(warning_message_id=None)
         image_url = f"{ base_url_secret + all_ads[current_ads_index]['accomodation_data']['main_image']}"
         image_from_url = URLInputFile(image_url)
 
@@ -214,9 +219,11 @@ async def get_next_ads(callback: types.CallbackQuery, state: FSMContext):
         await state.update_data(current_ads_index=(current_ads_index+1))
         ads_data = await state.get_data()
     else:
-        await callback.message.answer(
-            text=_("Це останнє оголошення")
-        )
+        if ('warning_message_id' not in ads_data) or (ads_data['warning_message_id']== None):
+            warning_message = await callback.message.answer(
+                text=_("Це останнє оголошення")
+            )
+            await state.update_data(warning_message_id=warning_message.message_id)
 
 
 @router.callback_query(F.data == "previous_my_ads")
@@ -227,6 +234,10 @@ async def previous_next_ads(callback: types.CallbackQuery, state: FSMContext):
     all_ads = ads_data['total_ads']
 
     if current_ads_index > 1:
+        if 'warning_message_id' in ads_data and ads_data['warning_message_id'] != None:
+            await callback.message.bot.delete_message(chat_id=callback.message.chat.id,
+                                                message_id=ads_data['warning_message_id'])
+            await state.update_data(warning_message_id=None)
         image_url = f"{ base_url_secret + all_ads[current_ads_index-2]['accomodation_data']['main_image']}"
         image_from_url = URLInputFile(image_url)
         ads = all_ads[current_ads_index-2]
@@ -257,9 +268,12 @@ async def previous_next_ads(callback: types.CallbackQuery, state: FSMContext):
 
         await state.update_data(current_ads_index=(current_ads_index-1))
     else:
-        await callback.message.answer(
-            text=_("Це оголошення найновіше")
-        )
+        if ('warning_message_id' not in ads_data) or (ads_data['warning_message_id']== None):
+            warning_message = await callback.message.answer(
+                text=_("Це оголошення найновіше")
+            )           
+            await state.update_data(warning_message_id=warning_message.message_id)
+
 
 
 @router.message(F.text == __('Попереднє меню'))
@@ -271,89 +285,3 @@ async def go_to_main_menu(message: types.Message, state: FSMContext):
     )
 
 
-
-
-
-
-
-
-
-
-
-
-# # -----------------------------------------------------------------------------------
-# list_of_test_texts = ['первый текст', 'второй текст']
-
-# builder_for_editing = InlineKeyboardBuilder()
-# builder_for_editing.add(types.InlineKeyboardButton(
-#     text="change_current_inline_text",
-#     callback_data="change_current_inline_text")
-# )
-
-
-
-# @router.message(F.text == 'Test update data inline button')
-# async def start_test_update_data(message: types.Message):
-
-#     await message.answer(text = list_of_test_texts[0],
-#                          reply_markup=builder_for_editing.as_markup())
-    
-
-
-# @router.callback_query(F.data == "change_current_inline_text")
-# async def change_text(callback: types.CallbackQuery):
-#     if callback.message.text == list_of_test_texts[0]:
-#         text = list_of_test_texts[1]
-#     else:
-#         text = list_of_test_texts[0]
-
-#     await callback.message.edit_text(
-#         text=text,
-#         reply_markup=builder_for_editing.as_markup()
-#     )
-
-
-
-
-
-# from services.get_secret_values import return_secret_value
-# bot_token_secret = return_secret_value("BOT_TOKEN")
-# from aiogram import Bot
-
-# bot = Bot(token=bot_token_secret, parse_mode="HTML")
-
-
-# # simple message editing
-# class ChangeSimpleButtonState(StatesGroup):
-#     # data states
-#     previous_message_id = State()
-
-
-# @router.message(F.text == 'Test update simpe button')
-# async def make_simple_message(message: types.Message, state: FSMContext):
-#     await state.update_data(previous_message_id=message.message_id)
-#     print('------message---id')
-#     print(message.message_id)
-#     print('------------------')
-#     await message.answer(
-#         text='BASE text status',
-#         reply_markup=make_main_profile_keyboards()
-#     )
-
-
-# @router.message(F.text == 'UPDATE SIMPLE BUTTON')
-# async def change_simple_button(message: types.Message, state: FSMContext):
-#     data = await state.get_data()
-    
-#     print('----previous--message--id----')
-#     print(data['previous_message_id'])
-#     print('-----------------------------')
-#     previous_message_id = data['previous_message_id']
-
-#     bot.edit_message_text(chat_id=message.chat.id, message_id=previous_message_id, text="EDITED!!!!!")
-
-#     await message.answer(
-#         # message_id=previous_message_id,
-#         text='you change smth!',
-#         reply_markup=make_main_profile_keyboards()
-#     )

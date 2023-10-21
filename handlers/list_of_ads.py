@@ -38,6 +38,9 @@ class AdsFeedState(StatesGroup):
     total_ads = State()
     total_ads_quantity = State()
     current_ads_index = State()
+    warning_message_id = State()
+
+
 
 
 builder = InlineKeyboardBuilder()
@@ -127,7 +130,12 @@ async def get_next_ads(callback: types.CallbackQuery, state: FSMContext):
     all_ads = ads_data['total_ads']
 
     if current_ads_index < last_ads_index:
+        if 'warning_message_id' in ads_data and ads_data['warning_message_id'] != None:
+            await callback.message.bot.delete_message(chat_id=callback.message.chat.id,
+                                                message_id=ads_data['warning_message_id'])
+            await state.update_data(warning_message_id=None)
         image_url = f"{ base_url_secret + all_ads[current_ads_index]['accomodation_data']['main_image']}"
+
         image_from_url = URLInputFile(image_url)
 
         await callback.message.edit_media(
@@ -146,9 +154,17 @@ async def get_next_ads(callback: types.CallbackQuery, state: FSMContext):
         await state.update_data(current_ads_index=(current_ads_index+1))
         ads_data = await state.get_data()
     else:
-        await callback.message.answer(
-            text=_("Це останнє оголошення")
-        )
+        
+        if ('warning_message_id' not in ads_data) or (ads_data['warning_message_id']== None):
+            warning_message = await callback.message.answer(
+                text=_("Це останнє оголошення")
+            )
+            await state.update_data(warning_message_id=warning_message.message_id)
+
+
+        # await callback.message.answer(
+        #     text=_("Це останнє оголошення")
+        # )
 
 
 @router.callback_query(F.data == "previous_ads")
@@ -159,6 +175,12 @@ async def previous_next_ads(callback: types.CallbackQuery, state: FSMContext):
     all_ads = ads_data['total_ads']
 
     if current_ads_index > 1:
+
+        if 'warning_message_id' in ads_data and ads_data['warning_message_id'] != None:
+            await callback.message.bot.delete_message(chat_id=callback.message.chat.id,
+                                                message_id=ads_data['warning_message_id'])
+            await state.update_data(warning_message_id=None)
+
         image_url = f"{ base_url_secret + all_ads[current_ads_index-2]['accomodation_data']['main_image']}"
         image_from_url = URLInputFile(image_url)
 
@@ -176,9 +198,14 @@ async def previous_next_ads(callback: types.CallbackQuery, state: FSMContext):
         
         await state.update_data(current_ads_index=(current_ads_index-1))
     else:
-        await callback.message.answer(
-            text=_("Це оголошення найновіше")
-        )
+        if ('warning_message_id' not in ads_data) or (ads_data['warning_message_id']== None):
+            warning_message = await callback.message.answer(
+                text=_("Це оголошення найновіше")
+            )           
+            await state.update_data(warning_message_id=warning_message.message_id)
+        # await callback.message.answer(
+        #     text=_("Це оголошення найновіше")
+        # )
 
 
 
