@@ -55,7 +55,7 @@ async def profile_main_menu(message: types.Message, middleware_access_data: Dict
         reply_markup=make_main_profile_keyboards()
     )
 
-
+import pprint
 @router.message(F.text == __("Мої дані"))
 async def get_user_data(message: types.Message, middleware_access_data: Dict[str, Any] | None):
     my_profile_request = OrdinaryRequestSwipeAPI()
@@ -69,6 +69,10 @@ async def get_user_data(message: types.Message, middleware_access_data: Dict[str
     response = my_profile_request(method, url, chat_id, **my_profile_dictionary)
     user_data_string = ""
     response_dict = json.loads(response.text)
+
+    print('**************************************************')
+    pprint.pprint(response_dict)
+    print('**************************************************')
 
     photo_link = response_dict['photo']
 
@@ -96,11 +100,30 @@ async def get_user_data(message: types.Message, middleware_access_data: Dict[str
 
     match response.status_code:
         case 200:
-            await message.answer_photo(
-                image_from_url,
-                caption=user_data_string,
-                reply_markup=make_main_profile_keyboards()
-            )    
+            # print('=========MY=======PROFILE==============')
+            # print(image_from_url)
+            # print('---------------------------------------')
+            # print(user_data_string)
+            # print('-------photo_link----------------------')
+            # print(photo_link)
+            # print(type(photo_link))
+
+            # print('=======================================')
+            if photo_link:
+                await message.answer_photo(
+                    photo=image_from_url,
+                    caption=user_data_string,
+                    reply_markup=make_main_profile_keyboards()
+                )
+            else:
+                await message.answer(
+                    text=user_data_string,
+                    reply_markup=make_main_profile_keyboards()
+                )
+            # await message.answer(
+            #     text=user_data_string,
+            #     reply_markup=make_main_profile_keyboards()
+            # )
 
         case _:
             await message.answer(
