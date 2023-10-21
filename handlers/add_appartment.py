@@ -85,12 +85,14 @@ class AccomodationState(StatesGroup):
     appartment_schema = State()
     appartment_addition_images = State()
 
+    saved_media_group_id = State()
+
     is_all_fields_filled = State()
 
 
 management_commands_set = ['відміна', 'зберігти квартиру', 'Зробити оголошення з існуючою квартирою',
-                           'змінити будинок', 'зміники корпус', 'змінити підїзд',
-                           'змінити поверх', 'змінити номер квартири']
+                           'змінити будинок і номер квартири', 'змінити тип нерухомості', 'змінити тип планування',
+                           'змінити життєві умови', 'змінити тип опалення', 'змінити схему квартири']
 
 
 
@@ -110,8 +112,11 @@ router.message.outer_middleware(StopMediaGroupReplicationMiddleware())
 
 
 @router.message(F.text == 'Додати квартиру')
+@router.message(F.text == 'змінити будинок і номер квартири')
 async def add_appartment(message: types.Message, state: FSMContext):
-    await state.clear()
+    if message.text == 'Додати квартиру':
+        await state.clear()
+
     auth_data = bot_aut_collection.find_one({"chat_id": message.chat.id})
     users_houses_request = OrdinaryRequestSwipeAPI()
     method = 'get'
@@ -235,7 +240,6 @@ async def get_house_entrance(message: types.Message, state: FSMContext):
     await state.set_state(AccomodationState.choosen_house_entrances)
 
 
-import pprint
 
 # принимаем и сохраняем подьезд, запрашиваем этаж
 @router.message(AccomodationState.choosen_house_entrances, ~F.text.in_(management_commands_set))
@@ -291,7 +295,6 @@ async def get_appartment_number(message: types.Message, state: FSMContext):
 
     # сохраняем стояк
     current_data = await state.get_data()
-    # -----
     all_current_house_risers = current_data['all_current_house_riser']
 
     for riser_dict in all_current_house_risers:
@@ -323,16 +326,11 @@ async def get_appartment_number(message: types.Message, state: FSMContext):
     list_of_used_numbers_str = [str(number) for number in list_of_used_numbers]
     used_numbers_str = ', '.join(list_of_used_numbers_str)
     
-
-    # # запрашиваем стояк
-    # await message.answer(text='Введіть номер квартири, який не є використаним.')
-    # list_of_used_numbers.sort()
     await message.answer(
         text=f'Використовуються такі номера: {used_numbers_str}',
         reply_markup=types.ReplyKeyboardRemove()
     )
     await state.set_state(AccomodationState.choosen_appartments_nember)
-    # await state.set_state(AccomodationState.choosen_house_riser)
 
 
 # принимаем и сохраняем номер квартиры, запрашиваем тип квартиры
@@ -340,12 +338,26 @@ async def get_appartment_number(message: types.Message, state: FSMContext):
 async def get_appartment_type(message: types.Message, state: FSMContext):
     await state.update_data(choosen_appartments_nember=message.text)
 
-    await message.answer(
-        text='Оберіть тип нерухомості',
-        reply_markup=choose_from_accomodation_model_dict_kb(type_status_dict)
-    )
+    
+    current_data = await state.get_data()
+    # editing appartment
 
-    await state.set_state(AccomodationState.appartments_type)
+    if 'is_all_fields_filled' in current_data:
+        accomodation_data = await generate_final_capture(state)
+        media_data = await return_presaved_image_data(state)
+        await message.answer_media_group(media=media_data)
+        await message.answer(
+            text=f'Бажаєте збирігти, чи відредагувати оголошення?\n\n{accomodation_data}',
+            reply_markup=save_or_change_accomodation_kb()
+        )
+    else:
+    # creating appartment
+        await message.answer(
+            text='Оберіть тип нерухомості',
+            reply_markup=choose_from_accomodation_model_dict_kb(type_status_dict)
+        )
+
+        await state.set_state(AccomodationState.appartments_type)
 
 
 
@@ -353,64 +365,110 @@ async def get_appartment_type(message: types.Message, state: FSMContext):
 @router.message(AccomodationState.appartments_type, ~F.text.in_(management_commands_set))
 async def get_planing_type(message: types.Message, state: FSMContext):
     await state.update_data(appartments_type=message.text)
+    current_data = await state.get_data()
+    if 'is_all_fields_filled' in current_data:
+        media_data = await return_presaved_image_data(state)
+        await message.answer_media_group(media=media_data)
+        accomodation_data = await generate_final_capture(state)
+        await message.answer(
+            text=f'Бажаєте збирігти, чи відредагувати оголошення?\n\n{accomodation_data}',
+            reply_markup=save_or_change_accomodation_kb()
+        )
+    else:
+        await message.answer(
+            text='Оберіть планування',
+            reply_markup=choose_from_accomodation_model_dict_kb(planing_dict)
+        )
 
-    await message.answer(
-        text='Оберіть планування',
-        reply_markup=choose_from_accomodation_model_dict_kb(planing_dict)
-    )
-
-    await state.set_state(AccomodationState.planning_type)
+        await state.set_state(AccomodationState.planning_type)
 
 
 # принимаем и сохраняем тип планировки, запрашиваем жилые условия
 @router.message(AccomodationState.planning_type, ~F.text.in_(management_commands_set))
 async def get_conditions_type(message: types.Message, state: FSMContext):
     await state.update_data(planning_type=message.text)
-
-    await message.answer(
-        text='Оберіть умови житла',
-        reply_markup=choose_from_accomodation_model_dict_kb(living_condition_dict)
-    )
-
-    await state.set_state(AccomodationState.living_condition)
+    current_data = await state.get_data()
+    if 'is_all_fields_filled' in current_data:
+        media_data = await return_presaved_image_data(state)
+        await message.answer_media_group(media=media_data)
+        accomodation_data = await generate_final_capture(state)
+        await message.answer(
+            text=f'Бажаєте збирігти, чи відредагувати оголошення?\n\n{accomodation_data}',
+            reply_markup=save_or_change_accomodation_kb()
+        )
+    else:
+        await message.answer(
+            text='Оберіть умови житла',
+            reply_markup=choose_from_accomodation_model_dict_kb(living_condition_dict)
+        )
+        await state.set_state(AccomodationState.living_condition)
 
 
 # принимаем и сохраняем условия, запрашиваем тип отопления
 @router.message(AccomodationState.living_condition, ~F.text.in_(management_commands_set))
 async def get_heat_type(message: types.Message, state: FSMContext):
     await state.update_data(living_condition=message.text)
+    current_data = await state.get_data()
+    if 'is_all_fields_filled' in current_data:
+        media_data = await return_presaved_image_data(state)
+        await message.answer_media_group(media=media_data)
+        accomodation_data = await generate_final_capture(state)
+        await message.answer(
+            text=f'Бажаєте збирігти, чи відредагувати оголошення?\n\n{accomodation_data}',
+            reply_markup=save_or_change_accomodation_kb()
+        )
+    else:
+        await message.answer(
+            text='Оберіть тип опалення',
+            reply_markup=choose_from_accomodation_model_dict_kb(heat_type_dict)
+        )
 
-    await message.answer(
-        text='Оберіть тип опалення',
-        reply_markup=choose_from_accomodation_model_dict_kb(heat_type_dict)
-    )
-
-    await state.set_state(AccomodationState.heat_type)
+        await state.set_state(AccomodationState.heat_type)
 
 
 # принимаем тип отопления, запрашиваем тип схему
 @router.message(AccomodationState.heat_type, ~F.text.in_(management_commands_set))
 async def get_schema_image(message: types.Message, state: FSMContext):
     await state.update_data(heat_type=message.text)
-    await message.answer(
-        text='завантажте схему квартири',
-        reply_markup=types.ReplyKeyboardRemove()
-    )
-    await state.set_state(AccomodationState.appartment_schema)
+    current_data = await state.get_data()
+    if 'is_all_fields_filled' in current_data:
+        media_data = await return_presaved_image_data(state)
+        await message.answer_media_group(media=media_data)
+        accomodation_data = await generate_final_capture(state)
+        await message.answer(
+            text=f'Бажаєте збирігти, чи відредагувати оголошення?\n\n{accomodation_data}',
+            reply_markup=save_or_change_accomodation_kb()
+        )
+    else:
+        await message.answer(
+            text='завантажте схему квартири',
+            reply_markup=types.ReplyKeyboardRemove()
+        )
+        await state.set_state(AccomodationState.appartment_schema)
 
 
 # принимаем схему и запрашиваем дополнительные фотографии
 @router.message(AccomodationState.appartment_schema, ~F.text.in_(management_commands_set), F.photo)
 async def get_appartment_schema(message: types.Message, state: FSMContext):
     await state.update_data(appartment_schema=message.photo[-1].file_id)
-    await message.answer(
-        text='завантажте додаткові фотографії квартири',
-        reply_markup=types.ReplyKeyboardRemove()
-    )
-    await state.set_state(AccomodationState.appartment_addition_images)
+    current_data = await state.get_data()
+    if 'is_all_fields_filled' in current_data:
+        media_data = await return_presaved_image_data(state)
+        await message.answer_media_group(media=media_data)
+        accomodation_data = await generate_final_capture(state)
+        await message.answer(
+            text=f'Бажаєте збирігти, чи відредагувати оголошення?\n\n{accomodation_data}',
+            reply_markup=save_or_change_accomodation_kb()
+        )
+    else:
+        await message.answer(
+            text='завантажте додаткові фотографії квартири',
+            reply_markup=types.ReplyKeyboardRemove()
+        )
+        await state.set_state(AccomodationState.appartment_addition_images)
 
 
-
+import pprint
 # принимаем дополнительные фото и даем результаты
 @router.message(AccomodationState.appartment_addition_images, ~F.text.in_(management_commands_set))
 async def get_additional_photo(message: types.Message, state: FSMContext):
@@ -419,6 +477,7 @@ async def get_additional_photo(message: types.Message, state: FSMContext):
     db = media_grop_couter_client.rptutorial
     media_group_counter = db.media_group_counter
     chat_data = media_group_counter.find_one({"media_group_id": message.media_group_id})
+    await state.update_data(saved_media_group_id = message.media_group_id)
     image_data_id = chat_data['image_list_id']
     await state.update_data(appartment_addition_images=image_data_id)
     media = []
@@ -430,6 +489,9 @@ async def get_additional_photo(message: types.Message, state: FSMContext):
     for image_id in image_data_id:
         media.append(types.InputMediaPhoto(media=image_id))
     await message.answer_media_group(media=media)
+    await state.update_data(
+        is_all_fields_filled='true'
+    )
     await message.answer(
         text=f'Бажаєте збирігти, чи відредагувати оголошення?\n\n{accomodation_data}',
         reply_markup=save_or_change_accomodation_kb()
@@ -445,10 +507,6 @@ async def save_appartment(message: types.Message, state: FSMContext):
 
     chat_id = message.chat.id
     appartment_dictionary = await state.get_data()
-
-    # planing_type = planing_dict[appartment_dictionary['planning_type']]
-
-    # {"area":["This field is required."],"area_kitchen":["This field is required."],"have_balcony":["This field is required."]}
 
     raw_data = {
         "type_status": type_status_dict[appartment_dictionary["appartments_type"]],
@@ -493,14 +551,6 @@ async def save_appartment(message: types.Message, state: FSMContext):
     response = create_appartment_request(method, url, chat_id, **request_dict)
     response_dict = json.loads(response.text)
 
-    print('=========================================================================================')
-    print('=========================================================================================')
-    print(response.status_code)
-    print(response.text)
-    print('=========================================================================================')
-    print('=========================================================================================')
-
-
     match response.status_code:
         case 201:
             response_text = "Ви додали квартиру!"
@@ -530,13 +580,63 @@ async def save_appartment(message: types.Message, state: FSMContext):
 
 
 
+    # editing fumctions
+
+@router.message(F.text == 'змінити тип нерухомості')
+async def edit_accomodation_type(message: types.Message, state: FSMContext):
+    await message.answer(
+        text='Оберіть тип нерухомості',
+        reply_markup=choose_from_accomodation_model_dict_kb(type_status_dict)
+    )
+    await state.set_state(AccomodationState.appartments_type)
 
 
-# --------------------------------------------------------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------------------------------------------------------
+@router.message(F.text == 'змінити тип планування')
+async def edit_planning_type(message: types.Message, state: FSMContext):
+    await message.answer(
+            text='Оберіть планування',
+            reply_markup=choose_from_accomodation_model_dict_kb(planing_dict)
+        )
+
+    await state.set_state(AccomodationState.planning_type)
+
+
+
+@router.message(F.text == 'змінити життєві умови')
+async def edit_living_conditions_type(message: types.Message, state: FSMContext):
+    await message.answer(
+            text='Оберіть умови житла',
+            reply_markup=choose_from_accomodation_model_dict_kb(living_condition_dict)
+        )
+    await state.set_state(AccomodationState.living_condition)
+
+
+@router.message(F.text == 'змінити тип опалення')
+async def edit_heating_type(message: types.Message, state: FSMContext):
+    await message.answer(
+            text='Оберіть тип опалення',
+            reply_markup=choose_from_accomodation_model_dict_kb(heat_type_dict)
+        )
+    await state.set_state(AccomodationState.heat_type)
+
+
+@router.message(F.text == 'змінити схему квартири')
+async def edit_accomofation_schema_type(message: types.Message, state: FSMContext):
+    await message.answer(
+        text='завантажте схему квартири',
+        reply_markup=types.ReplyKeyboardRemove()
+    )
+    await state.set_state(AccomodationState.appartment_schema)
+
+
+@router.message(F.text == 'змінити фотографії')
+async def edit_photo_type(message: types.Message, state: FSMContext):
+    await message.answer(
+            text='завантажте додаткові фотографії квартири',
+            reply_markup=types.ReplyKeyboardRemove()
+        )
+    await state.set_state(AccomodationState.appartment_addition_images)
+
 
 @router.message(F.text == 'Зробити оголошення з існуючою квартирою')
 async def return_to_previous_menu(message: types.Message, state: FSMContext):
@@ -558,8 +658,6 @@ async def return_to_previous_menu(message: types.Message, state: FSMContext):
         text="Оберіть квартиру для оголошення",
         reply_markup=create_ads_keyboard(accomodation_list_of_dict)
     )
-
-
 
 
 async def generate_final_capture(state: FSMContext):
@@ -591,20 +689,27 @@ async def generate_final_capture(state: FSMContext):
 
 
 
+async def return_presaved_image_data(state: FSMContext):
+    state_data = await state.get_data()
+    media_grop_couter_client = pymongo.MongoClient("mongodb://localhost:27017/")
+    db = media_grop_couter_client.rptutorial
+    media_group_counter = db.media_group_counter
 
+    chat_data = media_group_counter.find_one({"media_group_id": state_data['saved_media_group_id']})
+    image_data_id = chat_data['image_list_id']
+    await state.update_data(appartment_addition_images=image_data_id)
+    media = []
+    main_image_id = state_data['appartment_schema']
+    # accomodation_data = await generate_final_capture(state)
+    media.append(
+        types.InputMediaPhoto(media=main_image_id)
+    )
+    for image_id in image_data_id:
+        media.append(types.InputMediaPhoto(media=image_id))
 
+    return media
 
-
-
-
-
-
-
-
-
-
-
-
+    
 
         # file = await message.bot.get_file(image_id)
         # result = await message.bot.download_file(file.file_path)

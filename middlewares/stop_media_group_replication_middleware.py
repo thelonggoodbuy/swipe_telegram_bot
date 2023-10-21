@@ -79,11 +79,6 @@ class StopMediaGroupReplicationMiddleware(BaseMiddleware):
             data: Dict[str, Any]) -> Any:
 
         if event.media_group_id:
-            print('----------------OLD-----MIDDLEWARE----------------')
-
-            # print('---------------MEDDLEWARE--------------------')
-            # print(event.photo[-1].file_id)
-            # print('---------------------------------------------')
 
             media_grop_pymongo_client = pymongo.MongoClient("mongodb://localhost:27017/")
             db = media_grop_pymongo_client.rptutorial

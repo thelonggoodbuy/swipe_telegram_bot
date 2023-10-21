@@ -49,10 +49,7 @@ def choose_from_accomodation_model_dict_kb(obj_dict):
 def save_or_change_accomodation_kb() -> ReplyKeyboardMarkup:
     builder = ReplyKeyboardBuilder()
     builder.add(types.KeyboardButton(
-        text='змінити будинок і розташування квартири'
-    ))
-    builder.add(types.KeyboardButton(
-        text='зміники номер квартири'
+        text='змінити будинок і номер квартири'
     ))
     builder.add(types.KeyboardButton(
         text='змінити тип нерухомості'
