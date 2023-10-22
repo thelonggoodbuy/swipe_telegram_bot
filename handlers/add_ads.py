@@ -16,6 +16,10 @@ from keyboards.main_keyboard import make_main_keyboard
 mongo_url_secret = return_secret_value('MONGO_URL')
 base_url_secret = return_secret_value('BASE_URL')
 
+from aiogram.utils.i18n import lazy_gettext as __
+from aiogram.utils.i18n import gettext as _
+
+
 
 class AdsState(StatesGroup):
     free_accomodation_list = State()
@@ -27,9 +31,9 @@ class AdsState(StatesGroup):
     description = State()
     is_all_fields_filled = State()
 
-management_commands_set = ['відміна', 'зберігти оголошення', 'підтвердити зміну',
-                           'змінити вартість', 'зміники коміссію агента', 'змінити тип оплати',
-                           'змінити опис']
+management_commands_set = [__('відміна'), __('зберігти оголошення'), __('підтвердити зміну'),
+                           __('змінити вартість'), __('зміники коміссію агента'), __('змінити тип оплати'),
+                           __('змінити опис')]
 
 client = MongoClient(mongo_url_secret)
 db = client.rptutorial
@@ -37,7 +41,7 @@ bot_aut_collection = db.bot_aut_collection
 
 router = Router()
 
-@router.message(F.text == 'Створити оголошення')
+@router.message(F.text == __('Створити оголошення'))
 async def create_ad(message: types.Message, state: FSMContext):
     await state.clear()
     auth_data = bot_aut_collection.find_one({"chat_id": message.chat.id})
@@ -54,7 +58,7 @@ async def create_ad(message: types.Message, state: FSMContext):
         free_accomodation_list=accomodation_list_of_dict
     )
     await message.answer(
-        text="Оберіть квартиру для оголошення",
+        text=_("Оберіть квартиру для оголошення"),
         reply_markup=create_ads_keyboard(accomodation_list_of_dict)
     )
 
@@ -74,7 +78,7 @@ async def create_ads(message: types.Message, state: FSMContext):
     await state.update_data(accomodation_id=choosen_appartment_id,
                             appartment_area=choosen_appartment_area)    
     await message.answer(
-        text="Введіть вартість квартири в грн.",
+        text=_("Введіть вартість квартири в грн."),
         reply_markup=types.ReplyKeyboardRemove()
     )
     await state.set_state(AdsState.cost)
@@ -88,21 +92,21 @@ async def get_cost(message: types.Message, state: FSMContext) -> None:
     # first gatting price
     if 'is_all_fields_filled' not in accomodation_list_of_dict:
         await message.answer(
-            text="Введіть коміссію агента в процентах"
+            text=_("Введіть коміссію агента в процентах")
         )
         await state.set_state(AdsState.agent_commission)
     # updating price gatting price
     elif 'is_all_fields_filled' in accomodation_list_of_dict:
         ads_data = ''
-        ads_data +="Ціна: {cost}".format(cost=accomodation_list_of_dict['cost'])
-        ads_data +="\nКомміссія: {agent_commission}".format(agent_commission=accomodation_list_of_dict['agent_commission'])
-        ads_data +="\nТип оплати: {version_of_calculation}".format(version_of_calculation=accomodation_list_of_dict['version_of_calculation'])
-        ads_data +="\nОпис: {description}".format(description=accomodation_list_of_dict['description'])
+        ads_data +=__("Ціна: {cost}".format(cost=accomodation_list_of_dict['cost']))
+        ads_data +=__("\nКомміссія: {agent_commission}".format(agent_commission=accomodation_list_of_dict['agent_commission']))
+        ads_data +=__("\nТип оплати: {version_of_calculation}".format(version_of_calculation=accomodation_list_of_dict['version_of_calculation']))
+        ads_data +=__("\nОпис: {description}".format(description=accomodation_list_of_dict['description']))
         await message.answer(
             text=ads_data
         )
         await message.answer(
-            text="Зберігти оголошення, чи змінити данні?",
+            text=_("Зберігти оголошення, чи змінити данні?"),
             reply_markup = save_or_change_ads_kayboard()
         )
 
@@ -114,21 +118,21 @@ async def get_version_of_calculation(message: types.Message, state: FSMContext) 
     accomodation_list_of_dict = await state.get_data()
     if 'is_all_fields_filled' not in accomodation_list_of_dict:
         await message.answer(
-            text="Оберіть тип оплати",
+            text=_("Оберіть тип оплати"),
             reply_markup=choose_version_of_calculation()
         )
         await state.set_state(AdsState.version_of_calculation)
     elif 'is_all_fields_filled' in accomodation_list_of_dict:
         ads_data = ''
-        ads_data +="Ціна: {cost}".format(cost=accomodation_list_of_dict['cost'])
-        ads_data +="\nКомміссія: {agent_commission}".format(agent_commission=accomodation_list_of_dict['agent_commission'])
-        ads_data +="\nТип оплати: {version_of_calculation}".format(version_of_calculation=accomodation_list_of_dict['version_of_calculation'])
-        ads_data +="\nОпис: {description}".format(description=accomodation_list_of_dict['description'])
+        ads_data +=__("Ціна: {cost}".format(cost=accomodation_list_of_dict['cost']))
+        ads_data +=__("\nКомміссія: {agent_commission}".format(agent_commission=accomodation_list_of_dict['agent_commission']))
+        ads_data +=__("\nТип оплати: {version_of_calculation}".format(version_of_calculation=accomodation_list_of_dict['version_of_calculation']))
+        ads_data +=__("\nОпис: {description}".format(description=accomodation_list_of_dict['description']))
         await message.answer(
             text=ads_data
         )
         await message.answer(
-            text="Зберігти оголошення, чи змінити данні?",
+            text=_("Зберігти оголошення, чи змінити данні?"),
             reply_markup = save_or_change_ads_kayboard()
         )
 
@@ -137,34 +141,41 @@ async def get_version_of_calculation(message: types.Message, state: FSMContext) 
 @router.message(AdsState.version_of_calculation, ~F.text.in_(management_commands_set))
 async def get_description(message: types.Message, state: FSMContext) -> None:
 
-    match message.text:
-        case 'кредит':
-            calculation = 'credit'
-        case 'тільки готівка':
-            calculation = 'only_cash'
-        case 'іпотека':
-            calculation = 'mortgage'
+    if message.text == _('кредит'):
+        calculation = 'credit'
+    elif message.text == _('тільки готівка'):
+        calculation = 'only_cash'
+    elif message.text == _('іпотека'):
+        calculation = 'mortgage'
+
+    # match message.text:
+    #     case _('кредит'):
+    #         calculation = 'credit'
+    #     case _('тільки готівка'):
+    #         calculation = 'only_cash'
+    #     case _('іпотека'):
+    #         calculation = 'mortgage'
 
     await state.update_data(version_of_calculation=calculation)
     accomodation_list_of_dict = await state.get_data()
     if 'is_all_fields_filled' not in accomodation_list_of_dict:
         await message.answer(
-            text="Введіть опис для оголошення", 
+            text=_("Введіть опис для оголошення"), 
             reply_markup=types.ReplyKeyboardRemove()
         )
         await state.set_state(AdsState.description)
 
     elif 'is_all_fields_filled' in accomodation_list_of_dict:
         ads_data = ''
-        ads_data +="Ціна: {cost}".format(cost=accomodation_list_of_dict['cost'])
-        ads_data +="\nКомміссія: {agent_commission}".format(agent_commission=accomodation_list_of_dict['agent_commission'])
-        ads_data +="\nТип оплати: {version_of_calculation}".format(version_of_calculation=accomodation_list_of_dict['version_of_calculation'])
-        ads_data +="\nОпис: {description}".format(description=accomodation_list_of_dict['description'])
+        ads_data +=__("Ціна: {cost}".format(cost=accomodation_list_of_dict['cost']))
+        ads_data +=__("\nКомміссія: {agent_commission}".format(agent_commission=accomodation_list_of_dict['agent_commission']))
+        ads_data +=__("\nТип оплати: {version_of_calculation}".format(version_of_calculation=accomodation_list_of_dict['version_of_calculation']))
+        ads_data +=__("\nОпис: {description}".format(description=accomodation_list_of_dict['description']))
         await message.answer(
             text=ads_data
         )
         await message.answer(
-            text="Зберігти оголошення, чи змінити данні?",
+            text=_("Зберігти оголошення, чи змінити данні?"),
             reply_markup = save_or_change_ads_kayboard()
         )
 
@@ -182,24 +193,24 @@ async def save_or_update_menu(message: types.Message, state: FSMContext) -> None
 
     await  state.update_data(is_all_fields_filled='true')
 
-    ads_data +="Ціна: {cost}".format(cost=cost)
-    ads_data +="\nКомміссія: {agent_commission}".format(agent_commission=agent_commission)
-    ads_data +="\nТип оплати: {version_of_calculation}".format(version_of_calculation=version_of_calculation)
-    ads_data +="\nОпис: {description}".format(description=description)
+    ads_data +=__("Ціна: {cost}".format(cost=cost))
+    ads_data +=__("\nКомміссія: {agent_commission}".format(agent_commission=agent_commission))
+    ads_data +=__("\nТип оплати: {version_of_calculation}".format(version_of_calculation=version_of_calculation))
+    ads_data +=__("\nОпис: {description}".format(description=description))
 
 
     await message.answer(
         text=ads_data
     )
     await message.answer(
-        text="Зберігти оголошення, чи змінити данні?",
+        text=_("Зберігти оголошення, чи змінити данні?"),
         reply_markup = save_or_change_ads_kayboard()
     )
 
 
 
 
-@router.message(F.text == "зберігти оголошення")
+@router.message(F.text == __("зберігти оголошення"))
 async def save_ads(message: types.Message, state: FSMContext) -> None:
 
      
@@ -235,7 +246,7 @@ async def save_ads(message: types.Message, state: FSMContext) -> None:
 
     match response.status_code:
         case 201:
-            response_text = "Ви додали оголошення!"
+            response_text = _("Ви додали оголошення!")
             await message.answer(
                 text = response_text,
                 reply_markup=make_main_keyboard()
@@ -260,43 +271,38 @@ async def save_ads(message: types.Message, state: FSMContext) -> None:
             )
 
 
-
-
-
-
-
-@router.message(F.text == "відміна")
+@router.message(F.text == __("відміна"))
 async def save_ads(message: types.Message, state: FSMContext) -> None:
     await state.clear()
     await message.answer(
-        text="Головне меню",
+        text=_("Головне меню"),
         reply_markup = make_main_keyboard()
     )
 
 
-@router.message(F.text == "змінити вартість")
+@router.message(F.text == __("змінити вартість"))
 async def change_email(message: types.Message, state: FSMContext):
-    await message.answer("Введіть нову вартість")
+    await message.answer(_("Введіть нову вартість"))
     await state.set_state(AdsState.cost) 
 
 
-@router.message(F.text == "зміники коміссію агента")
+@router.message(F.text == __("зміники коміссію агента"))
 async def change_email(message: types.Message, state: FSMContext):
-    await message.answer("Введіть нову коміссію",
+    await message.answer(_("Введіть нову коміссію"),
                          reply_markup=types.ReplyKeyboardRemove())
     await state.set_state(AdsState.agent_commission) 
 
 
-@router.message(F.text == "змінити тип оплати")
+@router.message(F.text == __("змінити тип оплати"))
 async def change_email(message: types.Message, state: FSMContext):
-    await message.answer("оберіть новий тип оплати",
+    await message.answer(_("оберіть новий тип оплати"),
                          reply_markup=choose_version_of_calculation())
     await state.set_state(AdsState.version_of_calculation,
                           ) 
 
 
-@router.message(F.text == "змінити опис")
+@router.message(F.text == __("змінити опис"))
 async def change_email(message: types.Message, state: FSMContext):
-    await message.answer("введіть новий опис")
+    await message.answer(_("введіть новий опис"))
     await state.set_state(AdsState.description) 
 

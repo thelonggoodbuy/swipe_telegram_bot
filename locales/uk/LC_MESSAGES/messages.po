@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-10-10 23:03+0300\n"
-"PO-Revision-Date: 2023-10-09 18:48+0300\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2023-10-22 17:52+0300\n"
+"PO-Revision-Date: 2023-10-22 17:41+0300\n"
+"Last-Translator: \n"
 "Language: uk\n"
 "Language-Team: uk <LL@li.org>\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -19,19 +19,80 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.13.0\n"
 
-#: handlers/change_language.py:19
+#: handlers/add_ads.py:61 handlers/add_appartment.py:658
+msgid "Оберіть квартиру для оголошення"
+msgstr "Оберіть квартиру для оголошення"
+
+#: handlers/add_ads.py:81
+msgid "Введіть вартість квартири в грн."
+msgstr "Введіть вартість квартири в грн."
+
+#: handlers/add_ads.py:95
+msgid "Введіть коміссію агента в процентах"
+msgstr "Введіть коміссію агента в процентах"
+
+#: handlers/add_ads.py:109 handlers/add_ads.py:135 handlers/add_ads.py:171
+#: handlers/add_ads.py:199
+msgid "Зберігти оголошення, чи змінити данні?"
+msgstr "Зберігти оголошення, чи змінити данні?"
+
+#: handlers/add_ads.py:121
+msgid "Оберіть тип оплати"
+msgstr "Оберіть тип оплати"
+
+#: handlers/add_ads.py:145 keyboards/create_ads_keyboard.py:31
+msgid "кредит"
+msgstr "кредит"
+
+#: handlers/add_ads.py:147 keyboards/create_ads_keyboard.py:34
+msgid "тільки готівка"
+msgstr "тільки готівка"
+
+#: handlers/add_ads.py:149 keyboards/create_ads_keyboard.py:37
+msgid "іпотека"
+msgstr "іпотека"
+
+#: handlers/add_ads.py:156
+msgid "Введіть опис для оголошення"
+msgstr "Введіть опис для оголошення"
+
+#: handlers/add_ads.py:242
+msgid "Ви додали оголошення!"
+msgstr "Ви додали оголошення!"
+
+#: handlers/add_ads.py:271 handlers/main_menu.py:18 handlers/my_profile.py:290
+msgid "Головне меню"
+msgstr "Головне меню"
+
+#: handlers/add_ads.py:278
+msgid "Введіть нову вартість"
+msgstr "Введіть нову вартість"
+
+#: handlers/add_ads.py:284
+msgid "Введіть нову коміссію"
+msgstr "Введіть нову коміссію"
+
+#: handlers/add_ads.py:291
+msgid "оберіть новий тип оплати"
+msgstr "оберіть новий тип оплати"
+
+#: handlers/add_ads.py:299
+msgid "введіть новий опис"
+msgstr "введіть новий опис"
+
+#: handlers/change_language.py:21
 msgid "Оберіть мову"
-msgstr "Chouse language"
+msgstr "Оберіть мову"
 
 #: handlers/invite.py:17
 msgid "Привіт! Залогінся або зареєструйся =)"
 msgstr "Привіт! Залогінся або зареєструйся =)"
 
-#: handlers/list_of_ads.py:138 handlers/my_profile.py:219
+#: handlers/list_of_ads.py:158 handlers/my_profile.py:231
 msgid "Це останнє оголошення"
 msgstr "Це останнє оголошення"
 
-#: handlers/list_of_ads.py:163 handlers/my_profile.py:260
+#: handlers/list_of_ads.py:197 handlers/my_profile.py:280
 msgid "Це оголошення найновіше"
 msgstr "Це оголошення найновіше"
 
@@ -63,13 +124,112 @@ msgstr "Помилка в email або в пароли"
 msgid "Заповнення поля пароль є обов'язковим."
 msgstr "Заповнення поля пароль є обов'язковим."
 
-#: handlers/main_menu.py:18 handlers/my_profile.py:268
-msgid "Головне меню"
-msgstr "Головне меню"
-
-#: handlers/my_profile.py:51
+#: handlers/my_profile.py:64
 msgid "Оберіть дію"
 msgstr "Оберіть дію"
+
+#: handlers/my_profile.py:86
+msgid "ім'я"
+msgstr "ім'я"
+
+#: handlers/my_profile.py:87
+msgid "прізвище"
+msgstr "прізвище"
+
+#: handlers/my_profile.py:88
+msgid "телефон"
+msgstr "телефон"
+
+#: handlers/my_profile.py:91 handlers/my_profile.py:93
+#: handlers/my_profile.py:95 handlers/my_profile.py:97
+msgid "тип оповіщення"
+msgstr "тип оповіщення"
+
+#: handlers/my_profile.py:91
+msgid "оповещения пользователю"
+msgstr "оповещения пользователю"
+
+#: handlers/my_profile.py:93
+msgid "оповещения пользователю и агенту"
+msgstr "оповещения пользователю и агенту"
+
+#: handlers/my_profile.py:95
+msgid "оповещению агенту"
+msgstr "оповещению агенту"
+
+#: handlers/my_profile.py:97
+msgid "отключить оповещения"
+msgstr "отключить оповещения"
+
+#: handlers/my_profile.py:152 handlers/my_profile.py:203
+#: handlers/my_profile.py:253
+msgid "Будинок за адрессою {house}"
+msgstr "Будинок за адрессою {house}"
+
+#: handlers/my_profile.py:154 handlers/my_profile.py:205
+#: handlers/my_profile.py:255
+msgid ""
+"\n"
+"поверх {floor}"
+msgstr ""
+"\n"
+"поверх {floor}"
+
+#: handlers/my_profile.py:156 handlers/my_profile.py:207
+#: handlers/my_profile.py:257
+msgid ""
+"\n"
+"всього поверхів {total_floors}"
+msgstr ""
+"\n"
+"всього поверхів {total_floors}"
+
+#: handlers/my_profile.py:158 handlers/my_profile.py:209
+#: handlers/my_profile.py:259
+msgid ""
+"\n"
+"площа {area}"
+msgstr ""
+"\n"
+"площа {area}"
+
+#: handlers/my_profile.py:160 handlers/my_profile.py:211
+#: handlers/my_profile.py:261
+msgid ""
+"\n"
+"ціна {cost}"
+msgstr ""
+"\n"
+"ціна {cost}"
+
+#: handlers/my_profile.py:162 handlers/my_profile.py:213
+#: handlers/my_profile.py:263
+msgid ""
+"\n"
+"опис {description}"
+msgstr ""
+"\n"
+"опис {description}"
+
+#: handlers/my_profile.py:163
+msgid ""
+"\n"
+"\n"
+"1 з {len_result}"
+msgstr ""
+"\n"
+"\n"
+"1 з {len_result}"
+
+#: handlers/my_profile.py:214 handlers/my_profile.py:264
+msgid ""
+"\n"
+"\n"
+"{current_ads} з {last_ads_index}"
+msgstr ""
+"\n"
+"\n"
+"{current_ads} з {last_ads_index}"
 
 #: handlers/sign_up.py:51 handlers/sign_up.py:114
 msgid "Введіть свій email."
@@ -85,7 +245,7 @@ msgstr "Ви змінили пароль"
 
 #: handlers/sign_up.py:118
 msgid "Введіть пароль."
-msgstr "Введіть пароль"
+msgstr "Введіть пароль."
 
 #: handlers/sign_up.py:124
 msgid "Введіть новий email"
@@ -107,6 +267,81 @@ msgstr "Назад"
 msgid "Відміна"
 msgstr "Відміна"
 
+#: keyboards/create_ads_keyboard.py:14 keyboards/main_my_profile_keyboard.py:17
+msgid "Попереднє меню"
+msgstr "Попереднє меню"
+
+#: keyboards/create_ads_keyboard.py:17
+msgid "Додати квартиру"
+msgstr "Додати квартиру"
+
+#: keyboards/create_ads_keyboard.py:45
+msgid "змінити вартість"
+msgstr "змінити вартість"
+
+#: keyboards/create_ads_keyboard.py:48
+msgid "зміники коміссію агента"
+msgstr "зміники коміссію агента"
+
+#: keyboards/create_ads_keyboard.py:51
+msgid "змінити тип оплати"
+msgstr "змінити тип оплати"
+
+#: keyboards/create_ads_keyboard.py:54
+msgid "змінити опис"
+msgstr "змінити опис"
+
+#: keyboards/create_ads_keyboard.py:57
+msgid "зберігти оголошення"
+msgstr "зберігти оголошення"
+
+#: keyboards/create_ads_keyboard.py:60
+#: keyboards/create_appartment_keyboard.py:77
+msgid "відміна"
+msgstr "відміна"
+
+#: keyboards/create_appartment_keyboard.py:14
+msgid "ЖК {obj_1} за адресою {obj_2}"
+msgstr "ЖК {obj_1} за адресою {obj_2}"
+
+#: keyboards/create_appartment_keyboard.py:17
+#: keyboards/create_appartment_keyboard.py:31
+#: keyboards/create_appartment_keyboard.py:44
+msgid "Зробити оголошення з існуючою квартирою"
+msgstr "Зробити оголошення з існуючою квартирою"
+
+#: keyboards/create_appartment_keyboard.py:53
+msgid "змінити будинок і номер квартири"
+msgstr "змінити будинок і номер квартири"
+
+#: keyboards/create_appartment_keyboard.py:56
+msgid "змінити тип нерухомості"
+msgstr "змінити тип нерухомості"
+
+#: keyboards/create_appartment_keyboard.py:59
+msgid "змінити тип планування"
+msgstr "змінити тип планування"
+
+#: keyboards/create_appartment_keyboard.py:62
+msgid "змінити життєві умови"
+msgstr "змінити життєві умови"
+
+#: keyboards/create_appartment_keyboard.py:65
+msgid "змінити тип опалення"
+msgstr "змінити тип опалення"
+
+#: keyboards/create_appartment_keyboard.py:68
+msgid "змінити схему квартири"
+msgstr "змінити схему квартири"
+
+#: keyboards/create_appartment_keyboard.py:71
+msgid "змінити фотографії"
+msgstr "змінити фотографії"
+
+#: keyboards/create_appartment_keyboard.py:74
+msgid "зберігти квартиру"
+msgstr "зберігти квартиру"
+
 #: keyboards/invite_keyboard.py:11
 msgid "Увійти в бот"
 msgstr "Увійти в бот"
@@ -115,33 +350,29 @@ msgstr "Увійти в бот"
 msgid "Зареєструватись"
 msgstr "Зареєструватись"
 
-#: keyboards/invite_keyboard.py:17 keyboards/main_keyboard.py:21
-msgid "Змінити мову"
-msgstr "Змінити мову"
-
-#: keyboards/main_keyboard.py:12
+#: keyboards/main_keyboard.py:10
 msgid "Оголошення"
 msgstr "Оголошення"
 
-#: keyboards/main_keyboard.py:15
+#: keyboards/main_keyboard.py:13
 msgid "Створити оголошення"
 msgstr "Створити оголошення"
 
-#: keyboards/main_keyboard.py:18
+#: keyboards/main_keyboard.py:16
 msgid "Мій профіль"
 msgstr "Мій профіль"
 
-#: keyboards/main_my_profile_keyboard.py:12
+#: keyboards/main_keyboard.py:19
+msgid "Змінити мову"
+msgstr "Змінити мову"
+
+#: keyboards/main_my_profile_keyboard.py:11
 msgid "Мої оголошення"
 msgstr "Мої оголошення"
 
-#: keyboards/main_my_profile_keyboard.py:15
+#: keyboards/main_my_profile_keyboard.py:14
 msgid "Мої дані"
 msgstr "Мої дані"
-
-#: keyboards/main_my_profile_keyboard.py:18
-msgid "Попереднє меню"
-msgstr "Попереднє меню"
 
 #: keyboards/sign_up_update_keyboard.py:15
 msgid "Змінити email"
@@ -165,4 +396,25 @@ msgstr "Користувач з такими данними є заблоков�
 
 #~ msgid "показати геолокацію"
 #~ msgstr "показати геолокацію"
+
+#~ msgid "відміна"
+#~ msgstr "відміна"
+
+#~ msgid "зберігти оголошення"
+#~ msgstr "зберігти оголошення"
+
+#~ msgid "підтвердити зміну"
+#~ msgstr "підтвердити зміну"
+
+#~ msgid "змінити вартість"
+#~ msgstr "змінити вартість"
+
+#~ msgid "зміники коміссію агента"
+#~ msgstr "зміники коміссію агента"
+
+#~ msgid "змінити тип оплати"
+#~ msgstr "змінити тип оплати"
+
+#~ msgid "змінити опис"
+#~ msgstr "змінити опис"
 

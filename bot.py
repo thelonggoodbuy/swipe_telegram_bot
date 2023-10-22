@@ -26,8 +26,10 @@ async def main():
     redis_storage = RedisStorage.from_url(redis_url_secret)
     dp = Dispatcher(storage=redis_storage)
 
-    dp.message.outer_middleware(LanguageMiddleware(i18n))
-    dp.callback_query.outer_middleware(LanguageMiddleware(i18n))
+    dp.message.outer_middleware(LanguageMiddleware(i18n=i18n))
+    dp.message.middleware(LanguageMiddleware(i18n=i18n))
+    dp.callback_query.outer_middleware(LanguageMiddleware(i18n=i18n))
+    dp.callback_query.middleware(LanguageMiddleware(i18n=i18n))
 
     # dp.message.outer_middleware(LocaleMiddleware(i18n))
     # dp.callback_query.outer_middleware(LocaleMiddleware(i18n))

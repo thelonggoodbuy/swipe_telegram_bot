@@ -655,7 +655,7 @@ async def return_to_previous_menu(message: types.Message, state: FSMContext):
         free_accomodation_list=accomodation_list_of_dict
     )
     await message.answer(
-        text="Оберіть квартиру для оголошення",
+        text=_("Оберіть квартиру для оголошення"),
         reply_markup=create_ads_keyboard(accomodation_list_of_dict)
     )
 

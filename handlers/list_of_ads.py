@@ -84,9 +84,7 @@ async def list_of_ads_handler(message: types.Message, middleware_access_data: Di
         'Authorization': f"Bearer {auth_data['access_token']}"
     }}
     response = ads_request(method, url, chat_id, **ads_dict)
-    print('------------------------')
-    print(response)
-    print('------------------------')
+
     match response.status_code:
         case 200:
             result = json.loads(response.text)
@@ -162,10 +160,6 @@ async def get_next_ads(callback: types.CallbackQuery, state: FSMContext):
             await state.update_data(warning_message_id=warning_message.message_id)
 
 
-        # await callback.message.answer(
-        #     text=_("Це останнє оголошення")
-        # )
-
 
 @router.callback_query(F.data == "previous_ads")
 async def previous_next_ads(callback: types.CallbackQuery, state: FSMContext):
@@ -203,9 +197,6 @@ async def previous_next_ads(callback: types.CallbackQuery, state: FSMContext):
                 text=_("Це оголошення найновіше")
             )           
             await state.update_data(warning_message_id=warning_message.message_id)
-        # await callback.message.answer(
-        #     text=_("Це оголошення найновіше")
-        # )
 
 
 
