@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-10-22 17:52+0300\n"
-"PO-Revision-Date: 2023-10-22 17:54+0300\n"
+"POT-Creation-Date: 2023-10-22 20:55+0300\n"
+"PO-Revision-Date: 2023-10-22 21:07+0300\n"
 "Last-Translator: \n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -19,9 +19,9 @@ msgstr ""
 "Generated-By: Babel 2.13.0\n"
 "X-Generator: Poedit 2.3\n"
 
-#: handlers/add_ads.py:61 handlers/add_appartment.py:658
+#: handlers/add_ads.py:61 handlers/add_appartment.py:654
 msgid "Оберіть квартиру для оголошення"
-msgstr "Choose an apartment to advertise"
+msgstr "Choose an apartment for ads"
 
 #: handlers/add_ads.py:81
 msgid "Введіть вартість квартири в грн."
@@ -31,8 +31,8 @@ msgstr "Enter the price of the apartment in UAH."
 msgid "Введіть коміссію агента в процентах"
 msgstr "Enter the agent's commission as a percentage"
 
-#: handlers/add_ads.py:109 handlers/add_ads.py:135 handlers/add_ads.py:171
-#: handlers/add_ads.py:199
+#: handlers/add_ads.py:109 handlers/add_ads.py:135 handlers/add_ads.py:178
+#: handlers/add_ads.py:206
 msgid "Зберігти оголошення, чи змінити данні?"
 msgstr "Keep the ad or change the data?"
 
@@ -40,45 +40,237 @@ msgstr "Keep the ad or change the data?"
 msgid "Оберіть тип оплати"
 msgstr "Select the payment type"
 
-#: handlers/add_ads.py:145 keyboards/create_ads_keyboard.py:31
+#: handlers/add_ads.py:144 keyboards/create_ads_keyboard.py:31
 msgid "кредит"
 msgstr "credit"
 
-#: handlers/add_ads.py:147 keyboards/create_ads_keyboard.py:34
+#: handlers/add_ads.py:146 keyboards/create_ads_keyboard.py:34
 msgid "тільки готівка"
 msgstr "only cash"
 
-#: handlers/add_ads.py:149 keyboards/create_ads_keyboard.py:37
+#: handlers/add_ads.py:148 keyboards/create_ads_keyboard.py:37
 msgid "іпотека"
 msgstr "mortgage"
 
-#: handlers/add_ads.py:156
+#: handlers/add_ads.py:163
 msgid "Введіть опис для оголошення"
 msgstr "Enter a description for the ad"
 
-#: handlers/add_ads.py:242
+#: handlers/add_ads.py:249
 msgid "Ви додали оголошення!"
 msgstr "You have added an ad!"
 
-#: handlers/add_ads.py:271 handlers/main_menu.py:18 handlers/my_profile.py:290
+#: handlers/add_ads.py:278 handlers/main_menu.py:18 handlers/my_profile.py:290
 msgid "Головне меню"
 msgstr "Main menu"
 
-#: handlers/add_ads.py:278
+#: handlers/add_ads.py:285
 msgid "Введіть нову вартість"
 msgstr "Enter a new value"
 
-#: handlers/add_ads.py:284
+#: handlers/add_ads.py:291
 msgid "Введіть нову коміссію"
 msgstr "Enter a new commission"
 
-#: handlers/add_ads.py:291
+#: handlers/add_ads.py:298
 msgid "оберіть новий тип оплати"
 msgstr "choose a new payment type"
 
-#: handlers/add_ads.py:299
+#: handlers/add_ads.py:306
 msgid "введіть новий опис"
 msgstr "enter a new description"
+
+#: handlers/add_appartment.py:95 keyboards/create_ads_keyboard.py:60
+#: keyboards/create_appartment_keyboard.py:77
+msgid "відміна"
+msgstr "cancel"
+
+#: handlers/add_appartment.py:95 keyboards/create_appartment_keyboard.py:74
+msgid "зберігти квартиру"
+msgstr "save appartment"
+
+#: handlers/add_appartment.py:95 keyboards/create_appartment_keyboard.py:17
+#: keyboards/create_appartment_keyboard.py:31
+#: keyboards/create_appartment_keyboard.py:44
+msgid "Зробити оголошення з існуючою квартирою"
+msgstr "Make an ad with an existing apartment"
+
+#: handlers/add_appartment.py:96 keyboards/create_appartment_keyboard.py:53
+msgid "змінити будинок і номер квартири"
+msgstr "change the house and apartment number"
+
+#: handlers/add_appartment.py:96 keyboards/create_appartment_keyboard.py:56
+msgid "змінити тип нерухомості"
+msgstr "change the property type"
+
+#: handlers/add_appartment.py:96 keyboards/create_appartment_keyboard.py:59
+msgid "змінити тип планування"
+msgstr "change the planning type"
+
+#: handlers/add_appartment.py:97 keyboards/create_appartment_keyboard.py:62
+msgid "змінити життєві умови"
+msgstr "change living conditions"
+
+#: handlers/add_appartment.py:97 keyboards/create_appartment_keyboard.py:65
+msgid "змінити тип опалення"
+msgstr "change the heating type"
+
+#: handlers/add_appartment.py:97 keyboards/create_appartment_keyboard.py:68
+msgid "змінити схему квартири"
+msgstr "change the layout of the apartment"
+
+#: handlers/add_appartment.py:119 keyboards/create_ads_keyboard.py:17
+msgid "Додати квартиру"
+msgstr "Add appartment"
+
+#: handlers/add_appartment.py:139
+msgid "Оберіть будинок"
+msgstr "Choose an house"
+
+#: handlers/add_appartment.py:149
+msgid "ЖК "
+msgstr "Housing estate "
+
+#: handlers/add_appartment.py:150
+msgid " за адресою "
+msgstr " address "
+
+#: handlers/add_appartment.py:220
+msgid "Оберіть корпус"
+msgstr "Choose a house building"
+
+#: handlers/add_appartment.py:239
+msgid "Оберіть підїзд"
+msgstr "Choose an entrance"
+
+#: handlers/add_appartment.py:262
+msgid "Оберіть поверх"
+msgstr "Choose a floor"
+
+#: handlers/add_appartment.py:287
+msgid "Оберіть стояк"
+msgstr "Choose a riser"
+
+#: handlers/add_appartment.py:332
+msgid "Використовуються такі номера: {used_numbers_str}"
+msgstr "This number in use:  {used_numbers_str}"
+
+#: handlers/add_appartment.py:350 handlers/add_appartment.py:374
+#: handlers/add_appartment.py:396 handlers/add_appartment.py:417
+#: handlers/add_appartment.py:439 handlers/add_appartment.py:460
+#: handlers/add_appartment.py:496
+msgid ""
+"Бажаєте збирігти, чи відредагувати оголошення?\n"
+"\n"
+"{accomodation_data}"
+msgstr ""
+"Do you want to save or edit adverising?\n"
+"\n"
+"{accomodation_data}"
+
+#: handlers/add_appartment.py:356 handlers/add_appartment.py:584
+msgid "Оберіть тип нерухомості"
+msgstr "Choose the property type"
+
+#: handlers/add_appartment.py:379 handlers/add_appartment.py:593
+msgid "Оберіть планування"
+msgstr "Choose the planning type"
+
+#: handlers/add_appartment.py:401 handlers/add_appartment.py:604
+msgid "Оберіть умови житла"
+msgstr "Choose a live conditions"
+
+#: handlers/add_appartment.py:422 handlers/add_appartment.py:613
+msgid "Оберіть тип опалення"
+msgstr "Select a heating type"
+
+#: handlers/add_appartment.py:444 handlers/add_appartment.py:622
+msgid "завантажте схему квартири"
+msgstr "download appartment layout"
+
+#: handlers/add_appartment.py:465 handlers/add_appartment.py:631
+msgid "завантажте додаткові фотографії квартири"
+msgstr "download addition photo appartment"
+
+#: handlers/add_appartment.py:556
+msgid "Ви додали квартиру!"
+msgstr "You have added new appartment!"
+
+#: handlers/add_appartment.py:663
+msgid "Будинок: {choosen_house}"
+msgstr "House: {choosen_house}"
+
+#: handlers/add_appartment.py:665
+msgid ""
+"\n"
+"Корпус: {choosent_house_building}"
+msgstr ""
+"\n"
+"House building: {choosent_house_building}"
+
+#: handlers/add_appartment.py:667
+msgid ""
+"\n"
+"Підїзд: {choosen_entrance}"
+msgstr ""
+"\n"
+"Entrance: {choosen_entrance}"
+
+#: handlers/add_appartment.py:669
+msgid ""
+"\n"
+"Поверх: {choosen_floor}"
+msgstr ""
+"\n"
+"Floor: {choosen_floor}"
+
+#: handlers/add_appartment.py:671
+msgid ""
+"\n"
+"Стояк: {choosen_riser}"
+msgstr ""
+"\n"
+"Riser: {choosen_riser}"
+
+#: handlers/add_appartment.py:673
+msgid ""
+"\n"
+"Квартира №{choosen_appartment_number}"
+msgstr ""
+"\n"
+"Appartment №{choosen_appartment_number}"
+
+#: handlers/add_appartment.py:675
+msgid ""
+"\n"
+"Тип нерухомості: {appartments_type}"
+msgstr ""
+"\n"
+"Accomodation type: {appartments_type}"
+
+#: handlers/add_appartment.py:677
+msgid ""
+"\n"
+"Стан нерухомості: {conditions_type}"
+msgstr ""
+"\n"
+"accomodation state: {conditions_type}"
+
+#: handlers/add_appartment.py:679
+msgid ""
+"\n"
+"Тип планування: {planning_type}"
+msgstr ""
+"\n"
+"Planning type: {planning_type}"
+
+#: handlers/add_appartment.py:681
+msgid ""
+"\n"
+"Тип опалення: {heat_type}"
+msgstr ""
+"\n"
+"Heating type: {heat_type}"
 
 #: handlers/change_language.py:21
 msgid "Оберіть мову"
@@ -265,10 +457,6 @@ msgstr "Cancel"
 msgid "Попереднє меню"
 msgstr "Previous menu"
 
-#: keyboards/create_ads_keyboard.py:17
-msgid "Додати квартиру"
-msgstr "Add appartment"
-
 #: keyboards/create_ads_keyboard.py:45
 msgid "змінити вартість"
 msgstr "change cost"
@@ -289,51 +477,13 @@ msgstr "change description"
 msgid "зберігти оголошення"
 msgstr "save ad"
 
-#: keyboards/create_ads_keyboard.py:60 keyboards/create_appartment_keyboard.py:77
-msgid "відміна"
-msgstr "cancel"
-
 #: keyboards/create_appartment_keyboard.py:14
 msgid "ЖК {obj_1} за адресою {obj_2}"
 msgstr "{obj_1} with address {obj_2}"
 
-#: keyboards/create_appartment_keyboard.py:17
-#: keyboards/create_appartment_keyboard.py:31
-#: keyboards/create_appartment_keyboard.py:44
-msgid "Зробити оголошення з існуючою квартирою"
-msgstr "Make an ad with an existing apartment"
-
-#: keyboards/create_appartment_keyboard.py:53
-msgid "змінити будинок і номер квартири"
-msgstr "change the house and apartment number"
-
-#: keyboards/create_appartment_keyboard.py:56
-msgid "змінити тип нерухомості"
-msgstr "change the property type"
-
-#: keyboards/create_appartment_keyboard.py:59
-msgid "змінити тип планування"
-msgstr "change the planning type"
-
-#: keyboards/create_appartment_keyboard.py:62
-msgid "змінити життєві умови"
-msgstr "change living conditions"
-
-#: keyboards/create_appartment_keyboard.py:65
-msgid "змінити тип опалення"
-msgstr "change the heating type"
-
-#: keyboards/create_appartment_keyboard.py:68
-msgid "змінити схему квартири"
-msgstr "change the layout of the apartment"
-
 #: keyboards/create_appartment_keyboard.py:71
 msgid "змінити фотографії"
 msgstr "change photos"
-
-#: keyboards/create_appartment_keyboard.py:74
-msgid "зберігти квартиру"
-msgstr "save appartment"
 
 #: keyboards/invite_keyboard.py:11
 msgid "Увійти в бот"
