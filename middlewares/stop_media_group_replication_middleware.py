@@ -11,6 +11,8 @@ import pprint
 import base64
 
 
+from services.get_secret_values import return_secret_value
+mongo_url_secret = return_secret_value('MONGO_URL')
 
 
 class MediaGroupCounterMiddleware(BaseMiddleware):
@@ -21,7 +23,7 @@ class MediaGroupCounterMiddleware(BaseMiddleware):
             data: Dict[str, Any]) -> Any:
 
         if event.media_group_id:
-            media_grop_couter_client = pymongo.MongoClient("mongodb://localhost:27017/")
+            media_grop_couter_client = pymongo.MongoClient(mongo_url_secret)
             db = media_grop_couter_client.rptutorial
             media_group_counter = db.media_group_counter
             chat_data = media_group_counter.find_one({"chat_id": event.chat.id})
@@ -80,7 +82,7 @@ class StopMediaGroupReplicationMiddleware(BaseMiddleware):
 
         if event.media_group_id:
 
-            media_grop_pymongo_client = pymongo.MongoClient("mongodb://localhost:27017/")
+            media_grop_pymongo_client = pymongo.MongoClient(mongo_url_secret)
             db = media_grop_pymongo_client.rptutorial
             media_group_collection = db.media_group
 

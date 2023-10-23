@@ -473,7 +473,7 @@ import pprint
 @router.message(AccomodationState.appartment_addition_images, ~F.text.in_(management_commands_set))
 async def get_additional_photo(message: types.Message, state: FSMContext):
     state_data = await state.get_data()
-    media_grop_couter_client = pymongo.MongoClient("mongodb://localhost:27017/")
+    media_grop_couter_client = pymongo.MongoClient(mongo_url_secret)
     db = media_grop_couter_client.rptutorial
     media_group_counter = db.media_group_counter
     chat_data = media_group_counter.find_one({"media_group_id": message.media_group_id})
@@ -654,13 +654,18 @@ async def return_to_previous_menu(message: types.Message, state: FSMContext):
         text=_("Оберіть квартиру для оголошення"),
         reply_markup=create_ads_keyboard(accomodation_list_of_dict)
     )
-
+import pprint
 
 async def generate_final_capture(state: FSMContext):
     state_data = await state.get_data()
    
+    print('------------------------------------')
+    pprint.pprint(state_data)
+    print('------------------------------------')
+
+
     choosen_house = state_data["chosen_house_title"]
-    final_capture = _("Будинок: {choosen_house}".format(choosen_house))
+    final_capture = _("Будинок: {choosen_house}".format(choosen_house=choosen_house))
     choosent_house_building = state_data["chosen_building_title"]
     final_capture += _("\nКорпус: {choosent_house_building}".format(choosent_house_building=choosent_house_building))
     choosen_entrance = state_data["choosen_house_entrances_title"]
@@ -687,7 +692,7 @@ async def generate_final_capture(state: FSMContext):
 
 async def return_presaved_image_data(state: FSMContext):
     state_data = await state.get_data()
-    media_grop_couter_client = pymongo.MongoClient("mongodb://localhost:27017/")
+    media_grop_couter_client = pymongo.MongoClient(mongo_url_secret)
     db = media_grop_couter_client.rptutorial
     media_group_counter = db.media_group_counter
 

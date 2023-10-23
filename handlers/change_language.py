@@ -6,11 +6,17 @@ from keyboards.choose_language_keyboard import choose_language_keyboard
 import pymongo
 
 from keyboards.main_keyboard import make_main_keyboard_uk, make_main_keyboard_en
+from services.get_secret_values import return_secret_value
+
+
 
 from aiogram.utils.i18n import lazy_gettext as __
 from aiogram.utils.i18n import gettext as _
 
 
+
+mongo_url_secret = return_secret_value('MONGO_URL')
+base_url_secret = return_secret_value('BASE_URL')
 router = Router()
 
 
@@ -25,7 +31,7 @@ async def change_language(message: types.Message):
 
 @router.message(F.text == 'Українська')
 async def change_to_ukrainian(message: types.Message):
-    auth_pymongo_client = pymongo.MongoClient("mongodb://localhost:27017/")
+    auth_pymongo_client = pymongo.MongoClient(mongo_url_secret)
     auth_db = auth_pymongo_client.rptutorial
     auth_collection = auth_db.bot_aut_collection
     chat_data = auth_collection.find_one({"chat_id": message.chat.id})
@@ -38,7 +44,7 @@ async def change_to_ukrainian(message: types.Message):
 
 @router.message(F.text == 'English')
 async def change_to_ukrainian(message: types.Message):
-    auth_pymongo_client = pymongo.MongoClient("mongodb://localhost:27017/")
+    auth_pymongo_client = pymongo.MongoClient(mongo_url_secret)
     auth_db = auth_pymongo_client.rptutorial
     auth_collection = auth_db.bot_aut_collection
     chat_data = auth_collection.find_one({"chat_id": message.chat.id})

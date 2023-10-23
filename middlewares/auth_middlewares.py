@@ -6,6 +6,10 @@ from aiogram import BaseMiddleware
 from aiogram.types import Message
 
 from aiogram.utils.i18n import gettext as _
+from services.get_secret_values import return_secret_value
+
+mongo_url_secret = return_secret_value('MONGO_URL')
+
 
 class IsAuthenticatedMiddleware(BaseMiddleware):
     async def __call__(
@@ -15,7 +19,7 @@ class IsAuthenticatedMiddleware(BaseMiddleware):
             data: Dict[str, Any]
     ) -> Any:
         
-        auth_pymongo_client = pymongo.MongoClient("mongodb://localhost:27017/")
+        auth_pymongo_client = pymongo.MongoClient(mongo_url_secret)
         auth_db = auth_pymongo_client.rptutorial
         auth_collection = auth_db.bot_aut_collection
         user_id = auth_collection.find_one({"chat_id": event.chat.id})
@@ -35,7 +39,7 @@ class GetJWTAuthenticationMiddleware(BaseMiddleware):
     ) -> Any:
         
 
-        auth_pymongo_client = pymongo.MongoClient("mongodb://localhost:27017/")
+        auth_pymongo_client = pymongo.MongoClient(mongo_url_secret)
         auth_db = auth_pymongo_client.rptutorial
         auth_collection = auth_db.bot_aut_collection
         user_obj = auth_collection.find_one({"chat_id": event.chat.id})
