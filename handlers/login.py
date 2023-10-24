@@ -87,6 +87,13 @@ async def process_password(message: Message, state: FSMContext) -> None:
     data = {"email": auth_data['users_email'], "password": auth_data['users_password']}
     login_dict = {'data': data}
     response = login_request(method, url, chat_id, **login_dict)
+
+    print('-------------------------')
+    print(response)
+    print(response.status_code)
+    print(response.text)
+    print('-------------------------')
+
     response_dict = json.loads(response.text)
 
     match response.status_code:
